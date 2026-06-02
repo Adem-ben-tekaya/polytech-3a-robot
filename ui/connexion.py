@@ -46,6 +46,10 @@ class OngletConnexion(QWidget):
         self.bouton_connecter_selection.clicked.connect(self.connecter_marty_selectionne)
         layout.addWidget(self.bouton_connecter_selection)
 
+        self.bouton_deconnexion = QPushButton("Déconnecter")
+        self.bouton_deconnexion.clicked.connect(self.deconnecter)
+        layout.addWidget(self.bouton_deconnexion)
+
         self.setLayout(layout)
 
     def connecter_ip_manuelle(self):
@@ -102,3 +106,10 @@ class OngletConnexion(QWidget):
             self.label_statut.setText(f"Connecté à Marty : {ip}")
         except Exception as e:
             self.label_statut.setText(f"Erreur connexion : {e}")
+
+    def deconnecter(self):
+        try:
+            self.connexion.deconnecter()
+            self.label_statut.setText("Statut : déconnecté")
+        except Exception as e:
+            self.label_statut.setText(f"Erreur déconnexion : {e}")
