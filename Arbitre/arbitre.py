@@ -118,3 +118,4 @@ def calculer_points(couleur, bras, exp):
                 total += pts
 
     return total
+
