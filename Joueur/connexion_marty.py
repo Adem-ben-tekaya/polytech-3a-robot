@@ -20,10 +20,6 @@ class ConnexionMarty:
         self._connecte = False
         self._ip = None
 
-    # ------------------------------------------------------------------
-    # Connexion / déconnexion
-    # ------------------------------------------------------------------
-
     def connecter(self, ip: str) -> None:
         """Connecte le robot Marty à l'adresse *ip*.  Lève une exception en cas d'échec."""
         from martypy import Marty
@@ -54,11 +50,7 @@ class ConnexionMarty:
         """Accès direct à l'objet martypy (None si déconnecté)."""
         return self._marty
 
-    # ------------------------------------------------------------------
-    # Recherche sur le réseau
-    # ------------------------------------------------------------------
-
-    def rechercher_martys(self, reseau: str = "192.168.0",
+    def rechercher_martys(self, reseau: str = "192.168.1",
                           debut: int = 1, fin: int = 254) -> list:
         """
         Scanne les adresses {reseau}.{debut} … {reseau}.{fin} via HTTP.
@@ -90,10 +82,6 @@ class ConnexionMarty:
             t.join()
 
         return resultats
-
-    # ------------------------------------------------------------------
-    # Interne
-    # ------------------------------------------------------------------
 
     @staticmethod
     def _sonder_http(ip: str):

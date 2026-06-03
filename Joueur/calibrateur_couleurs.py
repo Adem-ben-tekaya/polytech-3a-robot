@@ -142,3 +142,6 @@ class CalibrateurCouleurs:
                 fichier.write("-" * 30 + "\n")
 
         return self.nom_fichier
+    
+
+    """correction"""
