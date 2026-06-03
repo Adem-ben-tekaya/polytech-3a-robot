@@ -10,8 +10,8 @@ from PyQt6.QtWidgets import (
     QTabWidget
 )
 #BACK-END IMPORTS#
-from calibrateur_couleurs import CalibrateurCouleurs #TODO: Gauthier relier back au front
-from connexion_marty import ConnexionMarty
+from Joueur.calibrateur_couleurs import CalibrateurCouleurs #TODO: Gauthier relier back au front
+from Joueur.connexion_marty import ConnexionMarty
 
 #FRONT-END IMPORTS#
 from ui.connexion import OngletConnexion
@@ -25,7 +25,7 @@ class MartySupreme(QWidget):
         super().__init__()
 
         self.connexion = ConnexionMarty()
-        # self.calibration = CalibrateurCouleurs()
+        self.calibration = CalibrateurCouleurs(self.connexion)
 
         self.setWindowTitle("Marty Supreme")
         self.resize(900, 600)

@@ -6,7 +6,7 @@ from PyQt6.QtWidgets import (
     QPushButton,
     QGroupBox
 )
-from mouvement_marty import MouvementMarty
+from Joueur.mouvement_marty import MouvementMarty
 
 
 class OngletJoueur(QWidget):
