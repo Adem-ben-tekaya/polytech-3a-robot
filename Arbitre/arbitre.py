@@ -1,4 +1,5 @@
 robots_connus = []
+regles_battle = {}
 
 def lister_robots():
     if not robots_connus:
