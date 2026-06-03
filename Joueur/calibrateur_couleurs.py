@@ -143,5 +143,3 @@ class CalibrateurCouleurs:
 
         return self.nom_fichier
     
-
-    """correction"""

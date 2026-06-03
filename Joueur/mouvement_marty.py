@@ -1,3 +1,5 @@
+from calibrateur_couleurs import detecter_couleur
+
 JOINT_LEFT_ARM   = 6
 JOINT_RIGHT_ARM  = 7
 ARM_UP           = 60
@@ -66,6 +68,7 @@ class MouvementMarty:
 
         token: 'XNT' neutre, 'XSD' triste, 'XNG' en colère, 'XHP' content, 'XDN' joueur
         """
+        #TODO Adem il y a des leds au dos de marty a allumer en fonction des expressions
         if not self._connexion.is_connected():
             return
         marty = self._connexion.marty
@@ -95,6 +98,9 @@ class MouvementMarty:
         g = marty.get_color_sensor_value_by_channel(1)
         b = marty.get_color_sensor_value_by_channel(2)
         return (r, g, b)
+    
+    def get_couleur(self):
+        return detecter_couleur
 
     def get_batterie(self) -> float:
         """Retourne le pourcentage de batterie restant, ou -1 si déconnecté."""
