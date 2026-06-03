@@ -10,7 +10,7 @@ from PyQt6.QtWidgets import (
     QTabWidget
 )
 #BACK-END IMPORTS#
-from Joueur.calibrateur_couleurs import CalibrateurCouleurs #TODO: Gauthier relier back au front
+from Joueur.calibrateur_couleurs import CalibrateurCouleurs
 from Joueur.connexion_marty import ConnexionMarty
 
 #FRONT-END IMPORTS#
