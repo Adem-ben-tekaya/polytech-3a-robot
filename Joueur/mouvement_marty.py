@@ -16,10 +16,6 @@ class MouvementMarty:
         self.connexion = connexion
         self.calibrateur = calibrateur
 
-    # ------------------------------------------------------------------
-    # Marche
-    # ------------------------------------------------------------------
-
     def marcher(self, direction: str, count: int = 1) -> None:
         """Fait avancer/reculer/pivoter le robot de *count* pas.
 
@@ -68,7 +64,6 @@ class MouvementMarty:
 
         token: 'XNT' neutre, 'XSD' triste, 'XNG' en colère, 'XHP' content, 'XDN' joueur
         """
-        #TODO Adem il y a des leds au dos de marty a allumer en fonction des expressions
         if not self._connexion.is_connected():
             return
         marty = self._connexion.marty

@@ -62,16 +62,18 @@ class OngletConnexion(QWidget):
         self.connecter_a_ip(ip)
 
     def rechercher_martys(self):
-        self.label_statut.setText("Recherche en cours...")
         self.liste_martys.clear()
         self.martys_trouves = []
 
+        reseau = self.connexion.detecter_reseau()
+        if reseau is None:
+            self.label_statut.setText("Adresse IP non trouvée.")
+            return
+
+        self.label_statut.setText(f"Adresse IP trouvée ({reseau}), recherche de Marty en cours...")
+
         try:
-            self.martys_trouves = self.connexion.rechercher_martys(
-                reseau="192.168.0",
-                debut=1,
-                fin=254
-            )
+            self.martys_trouves = self.connexion.rechercher_martys(reseau)
 
             if not self.martys_trouves:
                 self.label_statut.setText("Aucun Marty trouvé.")
