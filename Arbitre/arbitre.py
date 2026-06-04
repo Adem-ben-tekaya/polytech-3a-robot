@@ -1,3 +1,4 @@
+
 robots_connus = []
 regles_battle = {}
 

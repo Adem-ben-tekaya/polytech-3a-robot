@@ -3,6 +3,7 @@ from arbitre import *
 import uuid
 import argparse
 import sys
+import subprocess
 
 app = Flask(__name__)
 
@@ -87,6 +88,7 @@ def deconnecter_robot():            #Le robot se déconnecte et on affiche son s
 
 
 def main():
+    subprocess.run('netsh advfirewall firewall add rule name="Flask 8080" dir=in action=allow protocol=TCP localport=8080', shell=True)
     #Lecture des arguments de la ligne de commande
     parser = argparse.ArgumentParser(description='Serveur Arbitre - Dance Battle')
     parser.add_argument('--battle', type=str, default=None, help='Chemin vers le fichier .battle à charger au démarrage')
@@ -102,9 +104,10 @@ def main():
     print(f"Serveur démarré sur le port {args.port}")
 
     try:
-        app.run(port=args.port, debug=False, use_reloader=False)
+        app.run(host='0.0.0.0', port=args.port, debug=False, use_reloader=False)
     except KeyboardInterrupt:
         print("\nServeur arrêté.")
+        subprocess.run('netsh advfirewall firewall delete rule name="Flask 8080"', shell=True)
         afficher_scores()
         sys.exit(0)
     
