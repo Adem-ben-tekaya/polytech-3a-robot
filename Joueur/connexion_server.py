@@ -6,11 +6,13 @@ class ConnexionServeur:
         self.url_serveur = None
         self.rid = None
 
-    def definir_url(self, url_serveur):
+    def definir_url(self):
         """
         Exemple :
-        http://192.168.1.11:8000
+        http://192.168.1.12:8000
         """
+        ip_server= str(input("Entrez IP du serveur : "))
+        url_serveur = "http://"+ip_server+":8080"
         self.url_serveur = url_serveur.rstrip("/")
 
     def verifier_connexion(self):
@@ -40,11 +42,6 @@ class ConnexionServeur:
         return self.rid
 
     def start(self):
-        """
-        POST /start
-        Envoie le rid.
-        Le serveur renvoie le nombre de pas à effectuer.
-        """
         self._check_url()
         self._check_rid()
 
@@ -54,11 +51,13 @@ class ConnexionServeur:
 
         reponse = requests.post(
             f"{self.url_serveur}/start",
-            data=donnees,
+            json=donnees,
             timeout=3
         )
-        reponse.raise_for_status()
 
+        print("Réponse start :", reponse.status_code, reponse.text)
+
+        reponse.raise_for_status()
         return int(reponse.text)
 
     def step(self, couleur, bras, expression):
@@ -83,7 +82,7 @@ class ConnexionServeur:
 
         reponse = requests.post(
             f"{self.url_serveur}/step",
-            data=donnees,
+            json=donnees,
             timeout=3
         )
         reponse.raise_for_status()
@@ -147,23 +146,23 @@ class ConnexionServeur:
 if __name__ == "__main__":
     serveur = ConnexionServeur()
 
-    serveur.definir_url("http://192.168.1.14:8080")
+    serveur.definir_url()
 
     version = serveur.verifier_connexion()
     print("Version serveur :", version)
 
-    # rid = serveur.hello()
-    # print("Robot enregistré avec rid :", rid)
+    rid = serveur.hello()
+    print("Robot enregistré avec rid :", rid)
 
-    # nb_pas = serveur.start()
-    # print("Nombre de pas :", nb_pas)
+    nb_pas = serveur.start()
+    print("Nombre de pas :", nb_pas)
 
-    # points = serveur.step(
-    #     couleur="G",
-    #     bras="ALU+ARU",
-    #     expression="XNT"
-    # )
-    # print("Points gagnés :", points)
+    points = serveur.step(
+        couleur="G",
+        bras="ALU+ARU",
+        expression="XNT"
+    )
+    print("Points gagnés :", points)
 
     # score = serveur.score()
     # print("Score total :", score)
