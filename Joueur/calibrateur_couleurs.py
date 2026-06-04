@@ -3,7 +3,9 @@ import math
 
 
 class CalibrateurCouleurs:
-    def __init__(self, nom_fichier="Calibration des couleurs.txt"):
+
+    def __init__(self, connexion, nom_fichier="calibration_couleurs.txt"):
+        self.connexion = connexion
         self.nom_fichier = nom_fichier
         self.resultats = []
         self.numero_couleur = 1
@@ -19,6 +21,9 @@ class CalibrateurCouleurs:
         }
 
         self.resultats.append(mesure)
+
+    def lire_hex_capteur(self, pied="left"):
+        return self.connexion._marty.get_color_sensor_hex(pied)
 
     def couleur_suivante(self):
         self.numero_couleur += 1
@@ -94,7 +99,8 @@ class CalibrateurCouleurs:
 
         return zones
 
-    def detecter_couleur(self, valeur_hex):
+    def detecter_couleur(self):
+        valeur_hex = self.nettoyer_hex(self.lire_hex_capteur(self))
         rgb_lu = self.hex_vers_rgb(valeur_hex)
         zones = self.calculer_zones()
 
@@ -142,4 +148,3 @@ class CalibrateurCouleurs:
                 fichier.write("-" * 30 + "\n")
 
         return self.nom_fichier
-    
