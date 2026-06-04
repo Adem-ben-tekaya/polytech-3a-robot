@@ -50,14 +50,12 @@ class ConnexionMarty:
         """Accès direct à l'objet martypy (None si déconnecté)."""
         return self._marty
 
-    def rechercher_martys(self, reseau: str = "192.168.1",
+    def rechercher_martys(self, reseau: str,
                           debut: int = 1, fin: int = 254) -> list:
         """
         Scanne les adresses {reseau}.{debut} … {reseau}.{fin} via HTTP.
 
         Retourne une liste de dicts : [{'nom': str, 'ip': str}, ...]
-        Les robots dont la réponse HTTP contient un mot-clé Marty sont listés
-        en premier (marqués '[Marty]'), les autres hôtes actifs sont ignorés.
         """
         resultats = []
         lock = threading.Lock()
@@ -82,6 +80,23 @@ class ConnexionMarty:
             t.join()
 
         return resultats
+
+    @staticmethod
+    def detecter_reseau() -> str | None:
+        """Retourne le préfixe /24 de l'interface active (ex : '192.168.1').
+
+        Utilise un socket UDP sans envoi de données : l'OS choisit l'interface
+        sortante et on lit l'IP locale assignée.
+        Retourne None si la détection échoue.
+        """
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.connect(('8.8.8.8', 80))
+            ip_locale = s.getsockname()[0]
+            s.close()
+            return '.'.join(ip_locale.split('.')[:3])
+        except Exception:
+            return None
 
     @staticmethod
     def _sonder_http(ip: str):
