@@ -10,11 +10,12 @@ from Joueur.mouvement_marty import MouvementMarty
 
 
 class OngletJoueur(QWidget):
-    def __init__(self, connexion):
+    def __init__(self, connexion, calibrateur):
         super().__init__()
 
         self.connexion = connexion
-        self.mouvement = MouvementMarty(connexion)
+        self.calibrateur = calibrateur
+        self.mouvement = MouvementMarty(connexion, calibrateur)
 
         layout = QVBoxLayout()
 
@@ -142,8 +143,8 @@ class OngletJoueur(QWidget):
             self.label_statut.setText("Statut : robot non connecté")
             return
         try:
-            r, g, b = self.mouvement.get_couleur_raw()
-            self.label_statut.setText(f"Couleur capteur : R={r} G={g} B={b}")
+            couleur = self.mouvement.dtecter_couleur("left")
+            self.label_statut.setText(f"Couleur capteur : {couleur}")
         except Exception as e:
             self.label_statut.setText(f"Erreur capteur couleur : {e}")
 

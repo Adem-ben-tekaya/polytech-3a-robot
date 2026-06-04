@@ -11,10 +11,10 @@ SIDE_STEP_TIME   = 1000
 
 
 class MouvementMarty:
-    """Commandes de mouvement pour un robot Marty connecté via ConnexionMarty."""
 
-    def __init__(self, connexion):
-        self._connexion = connexion
+    def __init__(self, connexion, calibrateur):
+        self.connexion = connexion
+        self.calibrateur = calibrateur
 
     # ------------------------------------------------------------------
     # Marche
@@ -99,9 +99,9 @@ class MouvementMarty:
         b = marty.get_color_sensor_value_by_channel(2)
         return (r, g, b)
     
-    def get_couleur(self):
-        return detecter_couleur(self)
-
+    def get_couleur(self, pied="left"):
+        return self.calibrateur.detecter_couleur(pied)
+    
     def get_batterie(self) -> float:
         """Retourne le pourcentage de batterie restant, ou -1 si déconnecté."""
         if not self._connexion.is_connected():

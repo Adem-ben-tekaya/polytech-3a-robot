@@ -45,7 +45,7 @@ class MartySupreme(QWidget):
         )
 
         self.tabs.addTab(
-            OngletJoueur(self.connexion),
+            OngletJoueur(self.connexion, self.calibration),
             "Joueur"
         )
 

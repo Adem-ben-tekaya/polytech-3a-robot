@@ -99,25 +99,27 @@ class CalibrateurCouleurs:
 
         return zones
 
-    def detecter_couleur(self):
-        valeur_hex = self.nettoyer_hex(self.lire_hex_capteur(self))
-        rgb_lu = self.hex_vers_rgb(valeur_hex)
-        zones = self.calculer_zones()
+def detecter_couleur(self, pied="left"):
+    valeur_hex = self.lire_hex_capteur(pied)
+    valeur_hex = self.nettoyer_hex(valeur_hex)
 
-        meilleure_couleur = None
-        meilleure_distance = float("inf")
+    rgb_lu = self.hex_vers_rgb(valeur_hex)
+    zones = self.calculer_zones()
 
-        for nom, zone in zones.items():
-            distance = self.distance_rgb(rgb_lu, zone["centre_rgb"])
+    meilleure_couleur = None
+    meilleure_distance = float("inf")
 
-            if distance <= zone["rayon"] and distance < meilleure_distance:
-                meilleure_couleur = nom
-                meilleure_distance = distance
+    for nom, zone in zones.items():
+        distance = self.distance_rgb(rgb_lu, zone["centre_rgb"])
 
-        if meilleure_couleur is None:
-            return "inconnue"
+        if distance <= zone["rayon"] and distance < meilleure_distance:
+            meilleure_couleur = nom
+            meilleure_distance = distance
 
-        return meilleure_couleur
+    if meilleure_couleur is None:
+        return "inconnue"
+
+    return meilleure_couleur
 
     def sauvegarder(self):
         zones = self.calculer_zones()
