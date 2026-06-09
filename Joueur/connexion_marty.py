@@ -7,7 +7,7 @@ import urllib.error
 # Mots-clés recherchés dans la réponse HTTP pour identifier un Marty
 _MARTY_KEYWORDS = ('marty', 'ric', 'robotical')
 # Timeout (secondes) par hôte lors du scan réseau
-_SCAN_TIMEOUT = 1.5
+_SCAN_TIMEOUT = 0.5 #Anciennement 1.5
 # Nombre maximum de threads parallèles lors du scan
 _MAX_THREADS = 64
 
@@ -31,16 +31,17 @@ class ConnexionMarty:
 
     def deconnecter(self) -> None:
         """Déconnecte le robot proprement."""
-        self._connecte = False
-        self._ip = None
         if self._marty is None:
             return
         try:
             self._marty.stop('clear')
-            self._marty.disconnect()
+            self._marty.close()
         except Exception:
             pass
+
         self._marty = None
+        self._connecte = False
+        self._ip = None
 
     def is_connected(self) -> bool:
         return self._connecte
@@ -67,14 +68,14 @@ class ConnexionMarty:
                     resultats.append({'nom': f'[Marty] {nom}', 'ip': ip})
 
         threads = []
-        for i in range(debut, fin + 1):
+        import time
+        for i in range(debut, fin  +1):
             t = threading.Thread(target=sonder, args=(i,), daemon=True)
             threads.append(t)
             t.start()
             # Limite le nombre de threads actifs simultanément
             while sum(1 for th in threads if th.is_alive()) >= _MAX_THREADS:
-                pass
-
+                time.sleep(0.005)
         for t in threads:
             t.join()
 
@@ -98,17 +99,10 @@ class ConnexionMarty:
                 est_marty = any(
                     kw in server or kw in content for kw in _MARTY_KEYWORDS
                 )
-                nom = ConnexionMarty._hostname(ip)
+                nom = ip
                 return nom, est_marty
         except urllib.error.HTTPError:
             # Le serveur répond (4xx/5xx) mais n'est probablement pas un Marty
-            return ConnexionMarty._hostname(ip), False
+            return ip, False
         except Exception:
             return '', False
-
-    @staticmethod
-    def _hostname(ip: str) -> str:
-        try:
-            return socket.gethostbyaddr(ip)[0]
-        except OSError:
-            return ip

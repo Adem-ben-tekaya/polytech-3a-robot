@@ -64,6 +64,8 @@ class OngletConnexion(QWidget):
         self.connecter_a_ip(ip)
 
     def rechercher_martys(self):
+        import time
+        start_time = time.time()
         reseau = self.input_reseau.text().strip()
 
         if not reseau:
@@ -75,13 +77,12 @@ class OngletConnexion(QWidget):
 
         try:
             martys = self.connexion.rechercher_martys(reseau)
-
             if not martys:
-                self.label_statut.setText("Aucun Marty trouvé.")
+                self.label_statut.setText(f"Recherche terminée en {(time.time()-start_time):.2f} secondes. Aucun Marty trouvé.")
                 return
 
             for marty in martys:
-                item = QListWidgetItem(f"{marty['nom']} - {marty['ip']}")
+                item = QListWidgetItem(f"{marty['nom']} - {marty['ip']} en {(time.time()-start_time):.2f} secondes.")
                 item.setData(1000, marty["ip"])
                 self.liste_martys.addItem(item)
 
