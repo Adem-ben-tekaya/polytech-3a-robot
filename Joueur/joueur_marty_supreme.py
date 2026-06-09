@@ -37,7 +37,6 @@ class MartySupreme(QWidget):
 
         self.setWindowTitle("Marty Supreme")
         self.setWindowIcon(QIcon(chemin_icone))
-        self.resize(900, 600)
 
         layout = QVBoxLayout()
 
@@ -160,6 +159,11 @@ if __name__ == "__main__":
         """)
 
     window = MartySupreme()
+    screen = app.primaryScreen().availableGeometry()
+    window.resize(900, 600)
+    x = screen.x() + (screen.width() - window.width()) // 2
+    y = screen.y() + (screen.height() - window.height()) // 2
+    window.move(x, y)
     window.show()
 
     sys.exit(app.exec())

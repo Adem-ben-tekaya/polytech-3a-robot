@@ -1,3 +1,5 @@
+from PyQt6.QtCore import Qt
+
 from PyQt6.QtWidgets import (
     QWidget,
     QVBoxLayout,
@@ -19,6 +21,7 @@ class OngletJoueur(QWidget):
 
         layout = QVBoxLayout()
 
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.label_statut = QLabel("Statut : —")
         layout.addWidget(self.label_statut)
 
@@ -103,9 +106,41 @@ class OngletJoueur(QWidget):
         layout.addStretch()
         self.setLayout(layout)
 
+        #Empecher les boutons d'etre focusable par le clavier
+        for bouton in self.findChildren(QPushButton):
+            bouton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.setFocus()
+
     # ------------------------------------------------------------------
     # Slots privés
     # ------------------------------------------------------------------
+
+    def keyPressEvent(self, event):
+        """
+        Permet à l'utilisateur de déplacer Marty
+        avec les touches Z, Q, S et D
+        """
+        touche = event.key()
+
+        if touche == Qt.Key.Key_Z:
+            print("Clavier utiliser pour avancer")
+            self._marcher('U')
+
+        elif touche == Qt.Key.Key_S:
+            print("Clavier utiliser pour reculer")
+            self._marcher('B')
+
+        elif touche == Qt.Key.Key_Q:
+            print("Clavier utiliser pour aller à gauche")
+            self._marcher('L')
+
+        elif touche == Qt.Key.Key_D:
+            print("Clavier utiliser pour aller à droite")
+            self._marcher('R')
+
+        else:
+            super().keyPressEvent(event)
+
 
     def _marcher(self, direction: str):
         if not self.connexion.is_connected():
