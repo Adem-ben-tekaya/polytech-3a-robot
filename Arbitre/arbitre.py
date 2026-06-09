@@ -1,6 +1,11 @@
+import json
+import os
 
 robots_connus = []
 regles_battle = {}
+
+FICHIER_CLASSEMENT = "classement.json"
+
 
 def lister_robots():
     if not robots_connus:
@@ -11,8 +16,10 @@ def lister_robots():
         for info in robots_connus:
             print(f"ID : {info[0]}, Nom : {info[1]}, Score :  {info[2]}")
 
+
 def afficher_reception(couleur, bras, exp, points):
     print(f"Case : {couleur}, bras : {bras}, expression : {exp} et points : {points}")
+
 
 def afficher_scores():
     print("Scores :")
@@ -24,7 +31,6 @@ def afficher_scores():
         for info in classement:
             print(f" #{i}, ID : {info[0]}, Nom : {info[1]}, Score : {info[2]}")
             i=i+1
-
 
 
 def charger_battle(chemin_fichier):
@@ -79,12 +85,10 @@ def charger_battle(chemin_fichier):
         print(f"Impossible de lire le fichier .battle : {e}")
 
 
-
 def calculer_points(couleur, bras, exp):
 
     if not regles_battle:
         return 0
-
     if couleur not in regles_battle:
         return 0
 
@@ -121,3 +125,23 @@ def calculer_points(couleur, bras, exp):
 
     return total
 
+
+def charger_classement():
+    if not os.path.exists(FICHIER_CLASSEMENT):
+        return []
+    try:
+        with open(FICHIER_CLASSEMENT, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return []
+
+def sauvegarder_classement(classement):
+    with open(FICHIER_CLASSEMENT, "w", encoding="utf-8") as f:
+        json.dump(classement, f, indent=4, ensure_ascii=False)
+
+def mettre_a_jour_classement(nom, score):
+    classement = charger_classement()
+    classement.append({"nom": nom, "score": score})
+    classement.sort(key=lambda x: x["score"], reverse=True)
+    classement = classement[:10]
+    sauvegarder_classement(classement)
