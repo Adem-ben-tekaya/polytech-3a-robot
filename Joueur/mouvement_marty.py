@@ -2,12 +2,12 @@ from Joueur.calibrateur_couleurs import CalibrateurCouleurs
 
 JOINT_LEFT_ARM   = 6
 JOINT_RIGHT_ARM  = 7
-ARM_UP           = 60
-ARM_BACK         = -60
+ARM_UP           = 100
+ARM_BACK         = -100
 STEP_LENGTH      = 40
 STEP_TIME_MS     = 1500
 SIDE_STEP_LENGTH = 100
-SIDE_STEP_TIME   = 1000
+SIDE_STEP_TIME   = 200
 
 
 class MouvementMarty:
@@ -15,6 +15,11 @@ class MouvementMarty:
     def __init__(self, connexion, calibrateur):
         self._connexion = connexion
         self._calibrateur = calibrateur
+        
+    def goat_dance(self):
+        self.marty.stand_straight(300)
+        self.marty.arms(0, 0, 300, False)
+        self.set_expression("XDN")
 
     def marcher(self, direction: str, count: int = 1) -> None:
         """Fait avancer/reculer/pivoter le robot de *count* pas.
@@ -46,6 +51,10 @@ class MouvementMarty:
         if not self._connexion.is_connected():
             return
         marty = self._connexion.marty
+
+        if len(tokens) == 2:
+            marty.set_blocking(False)
+
         if 'ALU' in tokens:
             marty.move_joint(JOINT_LEFT_ARM, ARM_UP, STEP_TIME_MS)
         elif 'ALB' in tokens:
@@ -60,25 +69,62 @@ class MouvementMarty:
     # ------------------------------------------------------------------
 
     def set_expression(self, token: str) -> None:
-        """Applique une expression au visage du robot.
-
-        token: 'XNT' neutre, 'XSD' triste, 'XNG' en colère, 'XHP' content, 'XDN' joueur
-        """
         if not self._connexion.is_connected():
             return
+        
+        couleurs = [
+            "red",
+            "orange",
+            "yellow",
+            "green",
+            "blue",
+            "purple",
+            "white"
+        ]
         marty = self._connexion.marty
+
         expressions = {
-            'XNT': ('normal',  (255, 255, 255)),
-            'XSD': ('sad',     (0,   0,   255)),
-            'XNG': ('angry',   (255, 0,   0)),
-            'XHP': ('excited', (0,   255, 0)),
-            'XDN': ('normal',  (255, 165, 0)),
+            "XNT": {
+                "eyes": "normal",
+                "color": "off"
+            },
+            "XHP": {
+                "eyes": "excited",
+                "color": "green"
+            },
+            "XSD": {
+                "eyes": "wide",
+                "color": "blue"
+            },
+            "XNG": {
+                "eyes": "angry",
+                "color": "red"
+            },
+            "XDN": {
+                "eyes": "wiggle",
+                "color": "rainbow_animation"
+            },
         }
+
         if token not in expressions:
             return
-        eyes_mode, (r, g, b) = expressions[token]
-        marty.eyes(eyes_mode)
-        marty.set_leds('eyes', r, g, b)
+
+        config = expressions[token]
+        marty.set_blocking(False)
+        if token in ["XSD","XNG","XHP"] :
+            marty.disco_color(config["color"], marty.Disco.ALL, "all")
+            marty.eyes(config["eyes"], move_time=500)
+
+        elif token == "XNT" :
+            marty.disco_off(api='led')
+            marty.eyes(config["eyes"], move_time=1000)
+      
+        elif token == "XDN" :
+            marty.eyes(config["eyes"], move_time=1000)
+            for _ in range(2):
+                for couleur in couleurs:
+                   marty.disco_color(couleur, marty.Disco.ALL, "all")
+            marty.disco_off(api='led')
 
     # ------------------------------------------------------------------
     # Capteurs

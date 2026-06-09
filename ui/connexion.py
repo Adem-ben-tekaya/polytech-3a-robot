@@ -23,7 +23,7 @@ class OngletConnexion(QWidget):
 
         ligne_ip = QHBoxLayout()
 
-        self.input_ip = QLineEdit()
+        self.input_ip = QLineEdit("192.168.0.103")
         self.input_ip.setPlaceholderText("IP du Marty ex : 192.168.0.104")
 
         self.bouton_connexion = QPushButton("Connexion manuelle")

@@ -80,24 +80,6 @@ class ConnexionMarty:
 
         return resultats
 
-    # @staticmethod
-    # def detecter_reseau(reseau) -> str | None:
-    #     """Retourne le préfixe /24 de l'interface active (ex : '192.168.1').
-
-    #     Utilise un socket UDP sans envoi de données : l'OS choisit l'interface
-    #     sortante et on lit l'IP locale assignée.
-    #     Retourne None si la détection échoue.
-    #     """
-    #     try:
-    #         # s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    #         # s.connect(('8.8.8.8', 80))
-    #         # ip_locale = s.getsockname()[0]
-    #         # s.close()
-    #         print('.'.join(reseau.split('.')[:3]))
-    #         return '.'.join(reseau.split('.')[:3])
-    #     except Exception:
-    #         return None
-
     @staticmethod
     def _sonder_http(ip: str):
         """

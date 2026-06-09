@@ -6,7 +6,7 @@ from PyQt6.QtWidgets import (
     QPushButton,
     QGroupBox
 )
-from mouvement_marty import MouvementMarty
+from Joueur.mouvement_marty import MouvementMarty
 
 
 class OngletJoueur(QWidget):
@@ -80,7 +80,7 @@ class OngletJoueur(QWidget):
             ("Joueur",   'XDN'),
         ]:
             b = QPushButton(label)
-            b.clicked.connect(lambda checked, t=token: self._set_expression(t))
+            b.clicked.connect(lambda checked, t=token: self.set_expression(t))
             ligne_exp.addWidget(b)
 
         groupe_exp.setLayout(ligne_exp)
@@ -128,22 +128,21 @@ class OngletJoueur(QWidget):
         except Exception as e:
             self.label_statut.setText(f"Erreur bras : {e}")
 
-    def _set_expression(self, token: str):
+    def set_expression(self, token: str) -> None:
         if not self.connexion.is_connected():
-            self.label_statut.setText("Statut : robot non connecté")
             return
-        try:
-            self.mouvement.set_expression(token)
-            self.label_statut.setText(f"Expression : {token}")
-        except Exception as e:
-            self.label_statut.setText(f"Erreur expression : {e}")
+
+        marty = self.connexion.marty
+
+        self.mouvement.set_expression(token)
+        return
 
     def _lire_couleur(self):
         if not self.connexion.is_connected():
             self.label_statut.setText("Statut : robot non connecté")
             return
         try:
-            couleur = self.mouvement.dtecter_couleur("left")
+            couleur = self.mouvement.detecter_couleur("left")
             self.label_statut.setText(f"Couleur capteur : {couleur}")
         except Exception as e:
             self.label_statut.setText(f"Erreur capteur couleur : {e}")
