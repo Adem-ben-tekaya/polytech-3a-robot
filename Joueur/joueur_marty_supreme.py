@@ -2,6 +2,14 @@ import sys
 import os
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+import ctypes
+
+ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("marty.supreme.app")
+
+from PyQt6.QtGui import QIcon
+chemin_icone = chemin_icone = os.path.join(base_dir, "ui", "assets", "logo.ico")
 
 from PyQt6.QtWidgets import (
     QApplication,
@@ -28,6 +36,7 @@ class MartySupreme(QWidget):
         self.calibration = CalibrateurCouleurs(self.connexion)
 
         self.setWindowTitle("Marty Supreme")
+        self.setWindowIcon(QIcon(chemin_icone))
         self.resize(900, 600)
 
         layout = QVBoxLayout()
@@ -58,13 +67,15 @@ class MartySupreme(QWidget):
 
         self.setLayout(layout)
 
-    def closed(self, event):
+    def closeEvent(self, event):
         self.connexion.deconnecter()
         event.accept()
 
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+
+    app.setWindowIcon(QIcon(chemin_icone))
 
     window = MartySupreme()
     window.show()
