@@ -77,6 +77,88 @@ if __name__ == "__main__":
 
     app.setWindowIcon(QIcon(chemin_icone))
 
+    app.setStyleSheet("""
+        QWidget {
+            background-color: #1e1e2f;
+            color: #f5f5f5;
+            font-family: "Segoe UI";
+            font-size: 14px;
+        }
+
+        QTabWidget::pane {
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 6px;
+        }
+
+        QTabBar::tab {
+            background: #2b2b40;
+            color: #dddddd;
+            padding: 10px 18px;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            margin-right: 3px;
+        }
+
+        QTabBar::tab:selected {
+            background: #4b6cff;
+            color: white;
+        }
+
+        QGroupBox {
+            border: 1px solid #5d5d7a;
+            border-radius: 10px;
+            margin-top: 12px;
+            padding: 12px;
+            font-weight: bold;
+        }
+
+        QGroupBox::title {
+            subcontrol-origin: margin;
+            left: 12px;
+            padding: 0 6px;
+        }
+
+        QPushButton {
+            background-color: #4b6cff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 9px;
+        }
+
+        QPushButton:hover {
+            background-color: #6f86ff;
+        }
+
+        QPushButton:pressed {
+            background-color: #324bd6;
+        }
+
+        QLineEdit {
+            background-color: #2b2b40;
+            color: white;
+            border: 1px solid #5d5d7a;
+            border-radius: 8px;
+            padding: 8px;
+        }
+
+        QListWidget {
+            background-color: #2b2b40;
+            border: 1px solid #5d5d7a;
+            border-radius: 8px;
+            padding: 6px;
+        }
+
+        QListWidget::item {
+            padding: 8px;
+        }
+
+        QListWidget::item:selected {
+            background-color: #4b6cff;
+        }
+        """)
+
     window = MartySupreme()
     window.show()
 
