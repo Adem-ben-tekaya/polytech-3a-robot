@@ -13,8 +13,8 @@ SIDE_STEP_TIME   = 1000
 class MouvementMarty:
 
     def __init__(self, connexion, calibrateur):
-        self.connexion = connexion
-        self.calibrateur = calibrateur
+        self._connexion = connexion
+        self._calibrateur = calibrateur
 
     def marcher(self, direction: str, count: int = 1) -> None:
         """Fait avancer/reculer/pivoter le robot de *count* pas.
@@ -95,7 +95,7 @@ class MouvementMarty:
         return (r, g, b)
     
     def get_couleur(self, pied="left"):
-        return self.calibrateur.detecter_couleur(pied)
+        return self._calibrateur.detecter_couleur(pied)
     
     def get_batterie(self) -> float:
         """Retourne le pourcentage de batterie restant, ou -1 si déconnecté."""

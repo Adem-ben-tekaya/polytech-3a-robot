@@ -15,7 +15,6 @@ class OngletConnexion(QWidget):
         super().__init__()
 
         self.connexion = connexion
-        self.martys_trouves = []
 
         layout = QVBoxLayout()
 
@@ -25,26 +24,29 @@ class OngletConnexion(QWidget):
         ligne_ip = QHBoxLayout()
 
         self.input_ip = QLineEdit()
-        self.input_ip.setPlaceholderText("IP manuelle du Marty ex : 192.168.0.104")
+        self.input_ip.setPlaceholderText("IP du Marty ex : 192.168.0.104")
 
         self.bouton_connexion = QPushButton("Connexion manuelle")
         self.bouton_connexion.clicked.connect(self.connecter_ip_manuelle)
 
         ligne_ip.addWidget(self.input_ip)
         ligne_ip.addWidget(self.bouton_connexion)
-
         layout.addLayout(ligne_ip)
 
-        self.bouton_recherche = QPushButton("Rechercher les Marty sur le réseau")
+        self.input_reseau = QLineEdit("192.168.0")
+        self.input_reseau.setPlaceholderText("Réseau ex : 192.168.0")
+        layout.addWidget(self.input_reseau)
+
+        self.bouton_recherche = QPushButton("Rechercher les Marty")
         self.bouton_recherche.clicked.connect(self.rechercher_martys)
         layout.addWidget(self.bouton_recherche)
 
         self.liste_martys = QListWidget()
         layout.addWidget(self.liste_martys)
 
-        self.bouton_connecter_selection = QPushButton("Se connecter au Marty sélectionné")
-        self.bouton_connecter_selection.clicked.connect(self.connecter_marty_selectionne)
-        layout.addWidget(self.bouton_connecter_selection)
+        self.bouton_selection = QPushButton("Se connecter au Marty sélectionné")
+        self.bouton_selection.clicked.connect(self.connecter_selection)
+        layout.addWidget(self.bouton_selection)
 
         self.bouton_deconnexion = QPushButton("Déconnecter")
         self.bouton_deconnexion.clicked.connect(self.deconnecter)
@@ -62,41 +64,37 @@ class OngletConnexion(QWidget):
         self.connecter_a_ip(ip)
 
     def rechercher_martys(self):
-        self.liste_martys.clear()
-        self.martys_trouves = []
+        reseau = self.input_reseau.text().strip()
 
-        reseau = self.connexion.detecter_reseau()
-        if reseau is None:
-            self.label_statut.setText("Adresse IP non trouvée.")
+        if not reseau:
+            self.label_statut.setText("Erreur : entre un réseau.")
             return
 
-        self.label_statut.setText(f"Adresse IP trouvée ({reseau}), recherche de Marty en cours...")
+        self.liste_martys.clear()
+        self.label_statut.setText(f"Recherche sur {reseau}.x...")
 
         try:
-            self.martys_trouves = self.connexion.rechercher_martys(reseau)
+            martys = self.connexion.rechercher_martys(reseau)
 
-            if not self.martys_trouves:
+            if not martys:
                 self.label_statut.setText("Aucun Marty trouvé.")
                 return
 
-            for marty in self.martys_trouves:
-                texte = f"{marty['nom']} - {marty['ip']}"
-                item = QListWidgetItem(texte)
+            for marty in martys:
+                item = QListWidgetItem(f"{marty['nom']} - {marty['ip']}")
                 item.setData(1000, marty["ip"])
                 self.liste_martys.addItem(item)
 
-            self.label_statut.setText(
-                f"{len(self.martys_trouves)} Marty(s) trouvé(s)."
-            )
+            self.label_statut.setText(f"{len(martys)} Marty(s) trouvé(s).")
 
         except Exception as e:
             self.label_statut.setText(f"Erreur recherche : {e}")
 
-    def connecter_marty_selectionne(self):
+    def connecter_selection(self):
         item = self.liste_martys.currentItem()
 
         if item is None:
-            self.label_statut.setText("Erreur : sélectionne un Marty dans la liste.")
+            self.label_statut.setText("Erreur : sélectionne un Marty.")
             return
 
         ip = item.data(1000)

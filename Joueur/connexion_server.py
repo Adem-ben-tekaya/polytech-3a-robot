@@ -22,7 +22,7 @@ class ConnexionServeur:
         """
         self._check_url()
 
-        reponse = requests.get(f"{self.url_serveur}/", timeout=3)
+        reponse = requests.get(f"{self.url_serveur}/", timeout=5)
         reponse.raise_for_status()
 
         return reponse.text
@@ -125,7 +125,7 @@ class ConnexionServeur:
 
         reponse = requests.post(
             f"{self.url_serveur}/bye",
-            data=donnees,
+            json=donnees,
             timeout=3
         )
         reponse.raise_for_status()
@@ -164,8 +164,8 @@ if __name__ == "__main__":
     )
     print("Points gagnés :", points)
 
-    # score = serveur.score()
-    # print("Score total :", score)
+    score = serveur.score()
+    print("Score total :", score)
 
-    # serveur.bye()
-    # print("Robot déconnecté")
+    serveur.bye()
+    print("Robot déconnecté")
