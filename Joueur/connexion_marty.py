@@ -46,10 +46,50 @@ class ConnexionMarty:
     def is_connected(self) -> bool:
         return self._connecte
 
-    @property
-    def marty(self):
-        """Accès direct à l'objet martypy (None si déconnecté)."""
-        return self._marty
+    # @property
+    # def marty(self):
+    #     """Accès direct à l'objet martypy (None si déconnecté)."""
+    #     return self._marty
+
+    @staticmethod
+    def nettoyer_adresse_reseau(adresse):
+        adresse = adresse.strip()
+
+        if "/" in adresse:
+            adresse = adresse.split("/")[0]
+
+        morceaux = adresse.split(".")
+
+        if len(morceaux) not in (3, 4):
+            return None
+        try :
+            if not all(0 <= int(octet) <= 255 for octet in morceaux):
+                return None
+        except ValueError:
+            return None
+        
+        return ".".join(str(int(octet)) for octet in morceaux[:3])
+
+    @staticmethod
+    def nettoyer_adresse_marty(adresse):
+        adresse = adresse.strip()
+
+        if "/" in adresse:
+            adresse = adresse.split("/")[0]
+
+        morceaux = adresse.split(".")
+
+        if len(morceaux) != 4:
+            return None
+        try :
+            if not all(0 <= int(octet) <= 255 for octet in morceaux):
+                return None
+        except ValueError:
+            return None
+        
+        return ".".join(str(int(octet)) for octet in morceaux[:4])
+
+
 
     def rechercher_martys(self, reseau: str, debut: int = 1, fin: int = 254) -> list:
         """

@@ -55,10 +55,10 @@ class OngletConnexion(QWidget):
         self.setLayout(layout)
 
     def connecter_ip_manuelle(self):
-        ip = self.input_ip.text().strip()
+        ip = self.connexion.nettoyer_adresse_marty(self.input_ip.text())
 
         if not ip:
-            self.label_statut.setText("Erreur : entre une IP.")
+            self.label_statut.setText("Erreur : entre une IP valide.")
             return
 
         self.connecter_a_ip(ip)
@@ -66,10 +66,10 @@ class OngletConnexion(QWidget):
     def rechercher_martys(self):
         import time
         start_time = time.time()
-        reseau = self.input_reseau.text().strip()
+        reseau = self.connexion.nettoyer_adresse_reseau(self.input_reseau.text())
 
         if not reseau:
-            self.label_statut.setText("Erreur : entre un réseau.")
+            self.label_statut.setText("Erreur : réseau invalide.")
             return
 
         self.liste_martys.clear()
