@@ -33,8 +33,8 @@ class OngletCalibration(QWidget):
 
         layout.addWidget(self.bouton_mesure)
 
-        self.liste_mesures = QListWidget()
-        layout.addWidget(self.liste_mesures)
+        self.console = QListWidget()
+        layout.addWidget(self.console)
 
         self.setLayout(layout)
 
@@ -43,10 +43,16 @@ class OngletCalibration(QWidget):
         condition = self.combobox_condition.currentText()
 
         if couleur == "":
-            self.liste_mesures.addItem("Erreur : entre un nom de couleur")
+            self.console.addItem("Erreur : entre un nom de couleur")
             return
+        try :
+            self.calibrateur.ajouter_mesure(
+                couleur_reelle=couleur,
+                eclairage=condition
+            )
+        except RuntimeError as e:
+            self.console.addItem(f"{e}")
 
-        self.calibrateur.ajouter_mesure(
-            couleur_reelle=couleur,
-            eclairage=condition
-        )
+        except Exception as e:
+            self.console.addItem(f"Erreur calibration : {e}")
+        

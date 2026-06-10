@@ -28,7 +28,7 @@ class CalibrateurCouleurs:
             raise RuntimeError("Impossible de lire Marty : aucune connexion fournie")
         
         if not self.connexion.is_connected():
-            raise RuntimeError("Marty n'est pas connecte")
+            raise RuntimeError("Marty n'est pas connecté")
 
         valeur_hex = self.connexion.marty.get_color_sensor_hex(pied)
 
