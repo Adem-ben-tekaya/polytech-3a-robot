@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import (
     QLineEdit, QPushButton, QListWidget, QComboBox
 )
 
-from Joueur.calibrateur_couleurs import CalibrateurCouleurs
+from approbot.calibrateur_couleurs import CalibrateurCouleurs
 
 class OngletCalibration(QWidget):
     def __init__(self, connexion):

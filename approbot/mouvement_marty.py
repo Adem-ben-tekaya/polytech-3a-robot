@@ -1,4 +1,4 @@
-from Joueur.calibrateur_couleurs import CalibrateurCouleurs
+from approbot.calibrateur_couleurs import CalibrateurCouleurs
 
 JOINT_LEFT_ARM   = 6
 JOINT_RIGHT_ARM  = 7

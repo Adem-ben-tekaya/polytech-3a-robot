@@ -1,9 +1,13 @@
 import sys
+import os
 import argparse
 from PyQt6.QtWidgets import QApplication
 from arbitre import charger_battle
-from style import STYLE
-from fenetre import FenetrePrincipale
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+
+from ui.style import STYLE
+from ui.fenetre import FenetrePrincipale
 
 
 def main():

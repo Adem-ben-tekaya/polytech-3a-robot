@@ -18,8 +18,8 @@ from PyQt6.QtWidgets import (
     QTabWidget
 )
 #BACK-END IMPORTS#
-from Joueur.calibrateur_couleurs import CalibrateurCouleurs
-from Joueur.connexion_marty import ConnexionMarty
+from approbot.calibrateur_couleurs import CalibrateurCouleurs
+from approbot.connexion_marty import ConnexionMarty
 
 #FRONT-END IMPORTS#
 from ui.connexion import OngletConnexion

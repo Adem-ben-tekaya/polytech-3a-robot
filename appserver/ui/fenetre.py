@@ -7,7 +7,7 @@ from PyQt6.QtGui import QColor, QTextCursor
 from arbitre import robots_connus, charger_battle, charger_classement
 from signaux import signals
 from serveur import FlaskThread
-from style import COLOR_MAP
+from ui.style import COLOR_MAP
 import socket
 import subprocess
 
