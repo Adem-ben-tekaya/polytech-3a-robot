@@ -23,7 +23,7 @@ class OngletConnexion(QWidget):
 
         ligne_ip = QHBoxLayout()
 
-        self.input_ip = QLineEdit()
+        self.input_ip = QLineEdit("192.168.0.103")
         self.input_ip.setPlaceholderText("IP du Marty ex : 192.168.0.104")
 
         self.bouton_connexion = QPushButton("Connexion manuelle")
@@ -55,19 +55,21 @@ class OngletConnexion(QWidget):
         self.setLayout(layout)
 
     def connecter_ip_manuelle(self):
-        ip = self.input_ip.text().strip()
+        ip = self.connexion.nettoyer_adresse_marty(self.input_ip.text())
 
         if not ip:
-            self.label_statut.setText("Erreur : entre une IP.")
+            self.label_statut.setText("Erreur : entre une IP valide.")
             return
 
         self.connecter_a_ip(ip)
 
     def rechercher_martys(self):
-        reseau = self.input_reseau.text().strip()
+        import time
+        start_time = time.time()
+        reseau = self.connexion.nettoyer_adresse_reseau(self.input_reseau.text())
 
         if not reseau:
-            self.label_statut.setText("Erreur : entre un réseau.")
+            self.label_statut.setText("Erreur : réseau invalide.")
             return
 
         self.liste_martys.clear()
@@ -75,13 +77,12 @@ class OngletConnexion(QWidget):
 
         try:
             martys = self.connexion.rechercher_martys(reseau)
-
             if not martys:
-                self.label_statut.setText("Aucun Marty trouvé.")
+                self.label_statut.setText(f"Recherche terminée en {(time.time()-start_time):.2f} secondes. Aucun Marty trouvé.")
                 return
 
             for marty in martys:
-                item = QListWidgetItem(f"{marty['nom']} - {marty['ip']}")
+                item = QListWidgetItem(f"{marty['nom']} - {marty['ip']} en {(time.time()-start_time):.2f} secondes.")
                 item.setData(1000, marty["ip"])
                 self.liste_martys.addItem(item)
 

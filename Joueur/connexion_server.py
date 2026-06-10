@@ -1,5 +1,7 @@
 import requests
 
+MARTY_NAME = "MATHILDE PANOT"
+IP_SERVEUR = "192.168.0.108" #TODO
 
 class ConnexionServeur:
     def __init__(self):
@@ -7,11 +9,7 @@ class ConnexionServeur:
         self.rid = None
 
     def definir_url(self):
-        """
-        Exemple :
-        http://192.168.1.12:8000
-        """
-        ip_server= str(input("Entrez IP du serveur : "))
+        ip_server= IP_SERVEUR #TODO
         url_serveur = "http://"+ip_server+":8080"
         self.url_serveur = url_serveur.rstrip("/")
 
@@ -132,6 +130,25 @@ class ConnexionServeur:
 
         self.rid = None
 
+    def set_name(self):
+        """
+        Definir un nom pour le robot
+        """
+        self._check_url()
+        self._check_rid()
+
+        donnees = {
+            "rid": self.rid,
+            "name": MARTY_NAME
+        }
+
+        reponse = requests.post(
+            f"{self.url_serveur}/name",
+            json=donnees,
+            timeout=3
+        )
+        reponse.raise_for_status()
+
     def est_enregistre(self):
         return self.rid is not None
 
@@ -153,6 +170,9 @@ if __name__ == "__main__":
 
     rid = serveur.hello()
     print("Robot enregistré avec rid :", rid)
+
+    serveur.set_name()
+    print("Le robot s'appelle maintenant : ", MARTY_NAME)
 
     nb_pas = serveur.start()
     print("Nombre de pas :", nb_pas)
