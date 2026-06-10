@@ -1,5 +1,5 @@
 from flask import Flask, request
-from arbitre import *
+from gestion_battle import *
 import uuid
 import logging
 from PyQt6.QtCore import QThread

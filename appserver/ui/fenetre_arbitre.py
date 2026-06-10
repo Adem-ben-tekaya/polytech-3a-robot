@@ -4,9 +4,9 @@ from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLa
                             QFileDialog, QHeaderView, QFrame, QSplitter, QStatusBar, QLineEdit)
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QColor, QTextCursor
-from arbitre import robots_connus, charger_battle, charger_classement
+from gestion_battle import robots_connus, charger_battle, charger_classement
 from signaux import signals
-from serveur import FlaskThread
+from api_rest import FlaskThread
 from ui.style import COLOR_MAP
 import socket
 import subprocess
