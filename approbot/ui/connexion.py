@@ -33,7 +33,7 @@ class OngletConnexion(QWidget):
         ligne_ip.addWidget(self.bouton_connexion)
         layout.addLayout(ligne_ip)
 
-        self.input_reseau = QLineEdit("192.168.0")
+        self.input_reseau = QLineEdit("192.168.1")
         self.input_reseau.setPlaceholderText("Réseau ex : 192.168.0")
         layout.addWidget(self.input_reseau)
 
@@ -81,7 +81,7 @@ class OngletConnexion(QWidget):
                 self.label_statut.setText(f"Recherche terminée en {(time.time()-start_time):.2f} secondes. Aucun Marty trouvé.")
                 return
 
-            for appareil in self.martys_trouves:
+            for appareil in martys:
                 texte = f"{appareil['nom']} - {appareil['ip']}"
                 item = QListWidgetItem(texte)
                 item.setData(1000, appareil["ip"])

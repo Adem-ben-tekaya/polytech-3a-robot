@@ -107,6 +107,8 @@ class OngletJoueur(QWidget):
     # Slots privés
     # ------------------------------------------------------------------
 
+    
+
     def _marcher(self, direction: str):
         if not self.connexion.is_connected():
             self.label_statut.setText("Statut : robot non connecté")

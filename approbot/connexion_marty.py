@@ -1,7 +1,6 @@
-import socket
 import threading
 import urllib.request
-import urllib.error
+import json
 
 
 # Mots-clés recherchés dans la réponse HTTP pour identifier un Marty
@@ -48,10 +47,10 @@ class ConnexionMarty:
     def is_connected(self) -> bool:
         return self._connecte
 
-    # @property
-    # def marty(self):
-    #     """Accès direct à l'objet martypy (None si déconnecté)."""
-    #     return self._marty
+    @property
+    def marty(self):
+        """Accès direct à l'objet martypy (None si déconnecté)."""
+        return self._marty
 
     @staticmethod
     def nettoyer_adresse_reseau(adresse):
@@ -96,14 +95,15 @@ class ConnexionMarty:
     def rechercher_martys(self, reseau: str, debut: int = 1, fin: int = 254) -> list:
         resultats = []
         lock = threading.Lock()
-
+        print(reseau)
         def sonder(i):
             ip = f"{reseau}.{i}"
-            resultat = self._sonder_http(ip)
 
-            if resultat is not None:
+            resultat_marty = self._sonder_http(ip)
+
+            if resultat_marty is not None:
                 with lock:
-                    resultats.append(resultat)
+                    resultats.append(resultat_marty)
 
         threads = []
 
@@ -120,41 +120,46 @@ class ConnexionMarty:
 
         return resultats
 
-@staticmethod
-def _sonder_http(ip: str):
-    url = f"http://{ip}:8080/"
+    @staticmethod
+    def _sonder_http(ip: str):
+        """
+        Tente de détecter un Marty et de récupérer son friendlyName.
 
-    try:
-        req = urllib.request.Request(url)
-        req.add_header("Connection", "close")
+        Retourne :
+        {
+            "type": "marty",
+            "nom": "NOM_DU_MARTY",
+            "ip": "192.168.0.103"
+        }
 
-        with urllib.request.urlopen(req, timeout=_SCAN_TIMEOUT) as resp:
-            code = resp.getcode()
-            server = (resp.getheader("Server") or "").lower()
-            content = resp.read(256).decode("utf-8", errors="ignore").strip()
+        ou None si ce n'est pas un Marty.
+        """
 
-            est_marty = any(
-                kw in server or kw in content.lower()
-                for kw in _MARTY_KEYWORDS
-            )
+        url = f"http://{ip}/api/friendlyname"
 
-            # Cas serveur REST : GET / renvoie une version, ex "1.2"
-            if code == 200 and content:
-                return {
-                    "type": "serveur",
-                    "nom": f"Serveur REST v{content}",
-                    "ip": ip
-                }
+        try:
+            req = urllib.request.Request(url)
+            req.add_header("Connection", "close")
 
-            # Cas Marty
-            if est_marty:
-                return {
-                    "type": "marty",
-                    "nom": f"[Marty] {ip}",
-                    "ip": ip
-                }
+            with urllib.request.urlopen(req, timeout=_SCAN_TIMEOUT) as resp:
+                code = resp.getcode()
+                content = resp.read(512).decode("utf-8", errors="ignore").strip()
 
-    except Exception:
-        pass
+                if code != 200:
+                    return None
 
-    return None
+                data = json.loads(content)
+
+                if data.get("rslt") == "ok":
+                    friendly_name = data.get("friendlyName", ip)
+
+                    return {
+                        "type": "marty",
+                        "nom": f"{friendly_name}",
+                        "ip": ip
+                    }
+
+        except Exception:
+            return None
+
+        return None
