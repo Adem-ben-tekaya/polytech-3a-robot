@@ -9,7 +9,7 @@ import ctypes
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("marty.supreme.app")
 
 from PyQt6.QtGui import QIcon,QFont
-chemin_icone = os.path.join(base_dir, "ui", "assets", "logo.ico")
+chemin_icone = os.path.join(base_dir,"approbot", "ui", "assets", "logo.ico")
 
 from PyQt6.QtWidgets import (
     QApplication,
