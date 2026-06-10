@@ -26,18 +26,19 @@ class RequetesServeur:
         return reponse.text
 
     def hello(self):
-        """
-        POST /hello
-        Enregistre le robot côté serveur.
-        Le serveur renvoie un identifiant robot.
-        """
         self._check_url()
-
-        reponse = requests.post(f"{self.url_serveur}/hello", timeout=3)
+        reponse = requests.post(f"{self.url_serveur}/hello",timeout=3)
         reponse.raise_for_status()
-
-        self.rid = reponse.text.strip()
-        return self.rid
+        try:
+            return reponse.json()
+        except Exception:
+            return reponse.text
+        
+    def nom_robot(self, rid, nom):
+        self._check_url()
+        reponse = requests.post(f"{self.url_serveur}/name",json={"rid": rid,"name": nom},timeout=3)
+        reponse.raise_for_status()
+        return reponse.json()
 
     def start(self):
         self._check_url()
@@ -150,24 +151,16 @@ class RequetesServeur:
         reponse.raise_for_status()
 
     @staticmethod
-    def sonder_serveur(ip:str, timeout=0.5):
-        url = f"http://{ip}:8080"
-        # print(f'sondage serveur {ip}')
+    def sonder_serveur(ip: str, timeout=1):
         try:
-            reponse = requests.get(url, timeout=timeout)
-            print(f'Réponse du serveur {ip}: {reponse}')
-            if reponse.status_code == 200:
+            reponse = requests.get(f"http://{ip}:8080/",timeout=timeout)
+            if reponse.status_code != 200:
+                return None
+            data = reponse.json()
+            return {"type": "serveur","nom": f"Serveur REST v{data.get('version', '?')}","ip": ip}
+        except Exception:
+            return None
 
-                return {
-                    "type": "serveur",
-                    "nom": f"Serveur REST v{version}",
-                    "ip": ip
-                }
-
-        except requests.exceptions.RequestException:
-            pass
-
-        return None
 
     def est_enregistre(self):
         return self.rid is not None
