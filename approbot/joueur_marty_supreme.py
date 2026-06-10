@@ -8,7 +8,7 @@ import ctypes
 
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("marty.supreme.app")
 
-from PyQt6.QtGui import QIcon
+from PyQt6.QtGui import QIcon,QFont
 chemin_icone = os.path.join(base_dir, "ui", "assets", "logo.ico")
 
 from PyQt6.QtWidgets import (
@@ -77,12 +77,12 @@ if __name__ == "__main__":
 
     app.setWindowIcon(QIcon(chemin_icone))
 
+    app.setFont(QFont("Segoe UI", 10))
+
     app.setStyleSheet("""
         QWidget {
             background-color: #1e1e2f;
             color: #f5f5f5;
-            font-family: "Segoe UI";
-            font-size: 14px;
         }
 
         QTabWidget::pane {
