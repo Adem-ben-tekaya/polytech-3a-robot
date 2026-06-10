@@ -1,7 +1,6 @@
-import socket
 import threading
 import urllib.request
-import urllib.error
+import json
 
 
 # Mots-clés recherchés dans la réponse HTTP pour identifier un Marty
@@ -10,6 +9,8 @@ _MARTY_KEYWORDS = ('marty', 'ric', 'robotical')
 _SCAN_TIMEOUT = 0.5 #Anciennement 1.5
 # Nombre maximum de threads parallèles lors du scan
 _MAX_THREADS = 64
+# Stocke les eventuels serveur trouvés
+_SERVERS_DISCOVERED = []
 
 
 class ConnexionMarty:
@@ -46,10 +47,10 @@ class ConnexionMarty:
     def is_connected(self) -> bool:
         return self._connecte
 
-    # @property
-    # def marty(self):
-    #     """Accès direct à l'objet martypy (None si déconnecté)."""
-    #     return self._marty
+    @property
+    def marty(self):
+        """Accès direct à l'objet martypy (None si déconnecté)."""
+        return self._marty
 
     @staticmethod
     def nettoyer_adresse_reseau(adresse):
@@ -92,30 +93,28 @@ class ConnexionMarty:
 
 
     def rechercher_martys(self, reseau: str, debut: int = 1, fin: int = 254) -> list:
-        """
-        Scanne les adresses {reseau}.{debut} … {reseau}.{fin} via HTTP.
-
-        Retourne une liste de dicts : [{'nom': str, 'ip': str}, ...]
-        """
         resultats = []
         lock = threading.Lock()
-
+        print(reseau)
         def sonder(i):
             ip = f"{reseau}.{i}"
-            nom, est_marty = self._sonder_http(ip)
-            if est_marty:
+
+            resultat_marty = self._sonder_http(ip)
+
+            if resultat_marty is not None:
                 with lock:
-                    resultats.append({'nom': f'[Marty] {nom}', 'ip': ip})
+                    resultats.append(resultat_marty)
 
         threads = []
-        import time
-        for i in range(debut, fin  +1):
+
+        for i in range(debut, fin + 1):
             t = threading.Thread(target=sonder, args=(i,), daemon=True)
             threads.append(t)
             t.start()
-            # Limite le nombre de threads actifs simultanément
+
             while sum(1 for th in threads if th.is_alive()) >= _MAX_THREADS:
-                time.sleep(0.005)
+                pass
+
         for t in threads:
             t.join()
 
@@ -124,25 +123,43 @@ class ConnexionMarty:
     @staticmethod
     def _sonder_http(ip: str):
         """
-        Tente un GET HTTP sur l'IP.
+        Tente de détecter un Marty et de récupérer son friendlyName.
 
-        Retourne (nom_affichage, est_marty).
-        nom_affichage est '' si l'hôte est injoignable.
+        Retourne :
+        {
+            "type": "marty",
+            "nom": "NOM_DU_MARTY",
+            "ip": "192.168.0.103"
+        }
+
+        ou None si ce n'est pas un Marty.
         """
-        url = f'http://{ip}/'
+
+        url = f"http://{ip}/api/friendlyname"
+
         try:
             req = urllib.request.Request(url)
-            req.add_header('Connection', 'close')
+            req.add_header("Connection", "close")
+
             with urllib.request.urlopen(req, timeout=_SCAN_TIMEOUT) as resp:
-                server  = (resp.getheader('Server') or '').lower()
-                content = resp.read(256).decode('utf-8', errors='ignore').lower()
-                est_marty = any(
-                    kw in server or kw in content for kw in _MARTY_KEYWORDS
-                )
-                nom = ip
-                return nom, est_marty
-        except urllib.error.HTTPError:
-            # Le serveur répond (4xx/5xx) mais n'est probablement pas un Marty
-            return ip, False
+                code = resp.getcode()
+                content = resp.read(512).decode("utf-8", errors="ignore").strip()
+
+                if code != 200:
+                    return None
+
+                data = json.loads(content)
+
+                if data.get("rslt") == "ok":
+                    friendly_name = data.get("friendlyName", ip)
+
+                    return {
+                        "type": "marty",
+                        "nom": f"{friendly_name}",
+                        "ip": ip
+                    }
+
         except Exception:
-            return '', False
+            return None
+
+        return None

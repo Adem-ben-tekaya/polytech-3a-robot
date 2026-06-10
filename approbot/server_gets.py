@@ -1,9 +1,9 @@
 import requests
 
 MARTY_NAME = "MATHILDE PANOT"
-IP_SERVEUR = "192.168.0.108" #TODO
+IP_SERVEUR = "10.170.49.21" #TODO
 
-class ConnexionServeur:
+class RequetesServeur:
     def __init__(self):
         self.url_serveur = None
         self.rid = None
@@ -20,7 +20,7 @@ class ConnexionServeur:
         """
         self._check_url()
 
-        reponse = requests.get(f"{self.url_serveur}/", timeout=5)
+        reponse = requests.get(f"{self.url_serveur}/", timeout=3)
         reponse.raise_for_status()
 
         return reponse.text
@@ -149,6 +149,26 @@ class ConnexionServeur:
         )
         reponse.raise_for_status()
 
+    @staticmethod
+    def sonder_serveur(ip:str, timeout=0.5):
+        url = f"http://{ip}:8080"
+        # print(f'sondage serveur {ip}')
+        try:
+            reponse = requests.get(url, timeout=timeout)
+            print(f'Réponse du serveur {ip}: {reponse}')
+            if reponse.status_code == 200:
+
+                return {
+                    "type": "serveur",
+                    "nom": f"Serveur REST v{version}",
+                    "ip": ip
+                }
+
+        except requests.exceptions.RequestException:
+            pass
+
+        return None
+
     def est_enregistre(self):
         return self.rid is not None
 
@@ -161,7 +181,7 @@ class ConnexionServeur:
             raise RuntimeError("Robot non enregistré. Il faut appeler hello() avant.")
         
 if __name__ == "__main__":
-    serveur = ConnexionServeur()
+    serveur = RequetesServeur()
 
     serveur.definir_url()
 
