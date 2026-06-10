@@ -28,49 +28,25 @@ class OngletCalibration(QWidget):
         layout.addWidget(self.champ_nom)
         layout.addWidget(self.combobox_condition)
 
-        self.bouton_mesure = QPushButton("Enregistrer une mesure")
-        self.bouton_mesure.clicked.connect(self.enregistrer_mesure)
-
-        self.bouton_suivant = QPushButton("Couleur suivante")
-        self.bouton_suivant.clicked.connect(self.couleur_suivante)
-
-        self.bouton_sauvegarder = QPushButton("Sauvegarder calibration")
-        self.bouton_sauvegarder.clicked.connect(self.sauvegarder)
+        self.bouton_mesure = QPushButton("Enregistrer la mesure")
+        self.bouton_mesure.clicked.connect(self.ajouter_mesure)
 
         layout.addWidget(self.bouton_mesure)
-        layout.addWidget(self.bouton_suivant)
-        layout.addWidget(self.bouton_sauvegarder)
 
         self.liste_mesures = QListWidget()
         layout.addWidget(self.liste_mesures)
 
         self.setLayout(layout)
 
-    def enregistrer_mesure(self):
-        nom = self.champ_nom.text()
+    def ajouter_mesure(self):
+        couleur = self.champ_nom.text()
         condition = self.combobox_condition.currentText()
 
-        if nom == "":
+        if couleur == "":
             self.liste_mesures.addItem("Erreur : entre un nom de couleur")
             return
 
-        # À adapter selon ta classe connexion
-        valeur_hex = self.calibrateur.lire_hex_capteur()
-
-        self.calibrateur.enregistrer_mesure(
-            nom_couleur=nom,
-            condition=condition,
-            valeur_hex=valeur_hex
+        self.calibrateur.ajouter_mesure(
+            couleur_reelle=couleur,
+            eclairage=condition
         )
-
-        self.liste_mesures.addItem(
-            f"Couleur #{self.calibrateur.numero_couleur} | {nom} | {condition} | #{valeur_hex}"
-        )
-
-    def couleur_suivante(self):
-        self.calibrateur.couleur_suivante()
-        self.liste_mesures.addItem("---- Couleur suivante ----")
-
-    def sauvegarder(self):
-        nom_fichier = self.calibrateur.sauvegarder()
-        self.liste_mesures.addItem(f"Calibration sauvegardée dans : {nom_fichier}")

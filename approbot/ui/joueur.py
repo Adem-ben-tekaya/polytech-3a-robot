@@ -9,7 +9,6 @@ from PyQt6.QtWidgets import (
 )
 from approbot.mouvement_marty import MouvementMarty
 
-
 class OngletJoueur(QWidget):
     def __init__(self, connexion, calibrateur):
         super().__init__()
@@ -24,7 +23,7 @@ class OngletJoueur(QWidget):
         self.label_statut = QLabel("Statut : —")
         layout.addWidget(self.label_statut)
 
-        # --- Marche ---
+        #Marche 
         groupe_marche = QGroupBox("Marche")
         grille_marche = QVBoxLayout()
 
@@ -52,7 +51,7 @@ class OngletJoueur(QWidget):
         groupe_marche.setLayout(grille_marche)
         layout.addWidget(groupe_marche)
 
-        # --- Bras ---
+        #Bras 
         groupe_bras = QGroupBox("Bras")
         ligne_bras = QHBoxLayout()
 
@@ -70,7 +69,7 @@ class OngletJoueur(QWidget):
         groupe_bras.setLayout(ligne_bras)
         layout.addWidget(groupe_bras)
 
-        # --- Expression ---
+        #  Expression
         groupe_exp = QGroupBox("Expression")
         ligne_exp = QHBoxLayout()
 
@@ -80,6 +79,7 @@ class OngletJoueur(QWidget):
             ("Triste",   'XSD'),
             ("En colère",'XNG'),
             ("Joueur",   'XDN'),
+            ("67",   '67'),
         ]:
             b = QPushButton(label)
             b.clicked.connect(lambda checked, t=token: self.set_expression(t))
@@ -88,7 +88,7 @@ class OngletJoueur(QWidget):
         groupe_exp.setLayout(ligne_exp)
         layout.addWidget(groupe_exp)
 
-        # --- Capteurs ---
+        #Capteurs 
         groupe_capteurs = QGroupBox("Capteurs")
         ligne_capteurs = QHBoxLayout()
 
@@ -110,12 +110,7 @@ class OngletJoueur(QWidget):
         for bouton in self.findChildren(QPushButton):
             bouton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
-    # ------------------------------------------------------------------
-    # Slots privés
-    # ------------------------------------------------------------------
-
-
-    
+    #Slots privés
     def keyPressEvent(self, event):
         """
         Permet à l'utilisateur de déplacer Marty avec les flèches directionnelles
@@ -172,7 +167,7 @@ class OngletJoueur(QWidget):
             self.label_statut.setText("Statut : robot non connecté")
             return
         try:
-            couleur = self.mouvement.detecter_couleur("left")
+            couleur = self.mouvement.get_couleur("left")
             self.label_statut.setText(f"Couleur capteur : {couleur}")
         except Exception as e:
             self.label_statut.setText(f"Erreur capteur couleur : {e}")

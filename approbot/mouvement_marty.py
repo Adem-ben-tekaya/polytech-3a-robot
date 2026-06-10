@@ -104,6 +104,10 @@ class MouvementMarty:
                 "eyes": "wiggle",
                 "color": "rainbow_animation"
             },
+            "67": {
+                "eyes": "wiggle",
+                "color": "67676767"
+            },
         }
 
         if token not in expressions:
@@ -117,13 +121,20 @@ class MouvementMarty:
 
         elif token == "XNT" :
             marty.disco_off(api='led')
-            marty.eyes(config["eyes"], move_time=1000)
+            marty.eyes(config["eyes"], move_time=300)
       
         elif token == "XDN" :
             marty.eyes(config["eyes"], move_time=1000)
             for _ in range(2):
                 for couleur in couleurs:
                    marty.disco_color(couleur, marty.Disco.ALL, "all")
+            marty.disco_off(api='led')
+
+        elif token == "67" :
+            marty.eyes(config["eyes"], move_time=1000)
+            for _ in range(4):
+                self.set_bras("ARU", "ALB")
+                self.set_bras("ARB", "ALU")
             marty.disco_off(api='led')
 
     # ------------------------------------------------------------------

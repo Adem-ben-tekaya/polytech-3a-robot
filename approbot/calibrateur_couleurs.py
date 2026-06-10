@@ -1,152 +1,204 @@
-from datetime import datetime
+import json
+import os
 import math
+from datetime import datetime
 
+FICHIER_CALIBRATION_DEFAUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "calibration_couleurs.json")
 
 class CalibrateurCouleurs:
-
-    def __init__(self, connexion, nom_fichier="calibration_couleurs.txt"):
+    def __init__(self, connexion=None, nom_fichier=FICHIER_CALIBRATION_DEFAUT):
         self.connexion = connexion
         self.nom_fichier = nom_fichier
-        self.resultats = []
-        self.numero_couleur = 1
+        self.mesures = []
 
-    def enregistrer_mesure(self, nom_couleur, condition, valeur_hex):
-        valeur_hex = self.nettoyer_hex(valeur_hex)
+        self.charger_calibration()
+
+
+    def lire_valeur_brute(self, pied="left"):
+        """
+        Lit la valeur la plus exploitable du capteur couleur Marty.
+
+        Pour notre projet, on utilise la valeur HEX car elle représente déjà
+        une couleur complète sous forme RRGGBB.
+
+        Exemple retourné :
+        "871819"
+        """
+        if self.connexion is None:
+            raise RuntimeError("Impossible de lire Marty : aucune connexion fournie")
+        
+        if not self.connexion.is_connected():
+            raise RuntimeError("Marty n'est pas connecte")
+
+        valeur_hex = self.connexion.marty.get_color_sensor_hex(pied)
+
+        return self.nettoyer_hex(valeur_hex)
+
+
+    def ajouter_mesure(self, couleur_reelle, eclairage, valeur_brute=None, pied="left"):
+        """
+        Ajoute une mesure dans la calibration.
+
+        couleur_reelle : ex "Rouge", "Bleu", "Vert"
+        eclairage : "Lumineux", "Normal", "Sombre"
+        valeur_brute : optionnel, utile pour tester sans robot
+        pied : "left" ou "right"
+        """
+
+        if valeur_brute is None:
+            valeur_brute = self.lire_valeur_brute(pied)
+
+        valeur_brute = self.nettoyer_hex(valeur_brute)
 
         mesure = {
-            "numero": self.numero_couleur,
-            "nom": nom_couleur,
-            "condition": condition,
-            "hex": valeur_hex
+            "couleur": couleur_reelle.strip(),
+            "eclairage": eclairage.strip(),
+            "hex": valeur_brute,
+            "rgb": self.hex_vers_rgb(valeur_brute),
+            "date": datetime.now().isoformat(timespec="seconds")
         }
 
-        self.resultats.append(mesure)
+        self.mesures.append(mesure)
+        self.sauvegarder_calibration()
 
-    def lire_hex_capteur(self, pied="left"):
-        return self.connexion._marty.get_color_sensor_hex(pied)
+        return mesure
 
-    def couleur_suivante(self):
-        self.numero_couleur += 1
 
-    def nettoyer_hex(self, valeur_hex):
-        valeur_hex = str(valeur_hex).strip().replace("#", "")
+    def get_couleur(self, pied="left", seuil_max=80):
+        """
+        Lit le capteur et renvoie le nom de la couleur la plus proche.
 
-        # Certains capteurs renvoient parfois 7 caractères, ex : 1377c3d.
-        # On garde les 6 derniers pour obtenir un RGB exploitable.
+        Exemple :
+        capteur -> "FF6534"
+        retour  -> "Rouge"
+        """
+        valeur_brute = self.lire_valeur_brute(pied)
+        return self.trouver_couleur_depuis_hex(valeur_brute, seuil_max)
+
+    def trouver_couleur_depuis_hex(self, valeur_hex=None, seuil_max=80):
+        """
+        Trouve la couleur calibrée la plus proche d'une valeur HEX.
+
+        Cette fonction est très utile pour débugger sans robot :
+        calibrateur.trouver_couleur_depuis_hex("871819")
+        """
+        if not self.mesures:
+            return "inconnue/aucun fichier de calibration n'a été trouvé"
+        
+        if valeur_hex == None:
+            valeur_hex = self.lire_valeur_brute()
+
+        valeur_hex = self.nettoyer_hex(valeur_hex)
+        rgb_lu = self.hex_vers_rgb(valeur_hex)
+
+        meilleure_couleur = "inconnue/couleur par defaut"
+        meilleure_distance = float("inf")
+
+        for mesure in self.mesures:
+            rgb_ref = tuple(mesure["rgb"])
+            distance = self.distance_rgb(rgb_lu, rgb_ref)
+
+            if distance < meilleure_distance:
+                meilleure_distance = distance
+                meilleure_couleur = mesure["couleur"]
+
+        if meilleure_distance > seuil_max:
+            return "inconnue/seuil depasse"
+
+        return meilleure_couleur
+    
+    # Gestion du fichier de calibration
+    def sauvegarder_calibration(self):
+        """
+        Écrit dans le fichier de calibrations les mesures 
+        enregistrer durant la session de calibration
+        """
+        with open(self.nom_fichier, "w", encoding="utf-8") as fichier:
+            json.dump(self.mesures, fichier, indent=4, ensure_ascii=False)
+
+    def charger_calibration(self):
+        """
+        Créer une liste dans laquelle se trouvera l'intégralité des mesures 
+        enregistrer durant la session de calibration
+
+        Renvoi une liste vide si aucune calibration n'a été trouvée
+        """
+        if not os.path.exists(self.nom_fichier):
+            self.mesures = []
+            return
+
+        try:
+            with open(self.nom_fichier, "r", encoding="utf-8") as fichier:
+                self.mesures = json.load(fichier)
+
+        except Exception:
+            self.mesures = []
+
+    # Helpers
+    @staticmethod
+    def nettoyer_hex(valeur_hex):
+        """
+        Nettoie une valeur HEX.
+
+        Accepte :
+        "#FF6534"
+        "FF6534"
+        "0xff6534"
+        "aFf6534"
+
+        Retourne toujours :
+        "ff6534"
+        """
+        valeur_hex = str(valeur_hex).strip().lower()
+        valeur_hex = valeur_hex.replace("#", "")
+        valeur_hex = valeur_hex.replace("0x", "")
+
         if len(valeur_hex) > 6:
             valeur_hex = valeur_hex[-6:]
 
-        return valeur_hex.lower()
-
-    def hex_vers_rgb(self, valeur_hex):
-        valeur_hex = self.nettoyer_hex(valeur_hex)
-
         if len(valeur_hex) != 6:
-            raise ValueError(f"HEX invalide : {valeur_hex}")
+            raise ValueError(f"Valeur HEX invalide : {valeur_hex}")
 
-        r = int(valeur_hex[0:2], 16)
-        g = int(valeur_hex[2:4], 16)
-        b = int(valeur_hex[4:6], 16)
+        int(valeur_hex, 16)
 
-        return r, g, b
+        return valeur_hex
 
-    def distance_rgb(self, rgb1, rgb2):
+    @staticmethod
+    def hex_vers_rgb(clean_valeur_hex):
+
+        r = int(clean_valeur_hex[0:2], 16)
+        g = int(clean_valeur_hex[2:4], 16)
+        b = int(clean_valeur_hex[4:6], 16)
+
+        return [r, g, b]
+
+    @staticmethod
+    def distance_rgb(rgb1, rgb2):
         return math.sqrt(
             (rgb1[0] - rgb2[0]) ** 2 +
             (rgb1[1] - rgb2[1]) ** 2 +
             (rgb1[2] - rgb2[2]) ** 2
         )
+    
+if __name__ == "__main__":
+    calibrateur = CalibrateurCouleurs(connexion=None)
+    for color,hex_color in [
+        ("Rouge","#ff0000"),
+        ("Vert","#00ff00"),
+        ("Bleu","#0000ff"),
+        ("Jaune","#ffff00"),
+        ("Magenta","#ff00ff"),
+        ("Cyan","#00ffff"),
+        ("Blanc","#ffffff"),
+        ("Noir","#000000")
+        ]:
 
-    def calculer_zones(self, marge_minimale=25):
-        zones = {}
+        mesure = calibrateur.ajouter_mesure(
+            couleur_reelle=color,
+            eclairage="Lumineux",
+            valeur_brute= hex_color
+        )
+        print(mesure)
 
-        for mesure in self.resultats:
-            nom = mesure["nom"]
-            rgb = self.hex_vers_rgb(mesure["hex"])
-
-            if nom not in zones:
-                zones[nom] = {
-                    "mesures_rgb": [],
-                    "centre_rgb": None,
-                    "rayon": 0
-                }
-
-            zones[nom]["mesures_rgb"].append(rgb)
-
-        for nom, zone in zones.items():
-            mesures = zone["mesures_rgb"]
-
-            moyenne_r = sum(rgb[0] for rgb in mesures) / len(mesures)
-            moyenne_g = sum(rgb[1] for rgb in mesures) / len(mesures)
-            moyenne_b = sum(rgb[2] for rgb in mesures) / len(mesures)
-
-            centre = (
-                round(moyenne_r),
-                round(moyenne_g),
-                round(moyenne_b)
-            )
-
-            distances = [
-                self.distance_rgb(rgb, centre)
-                for rgb in mesures
-            ]
-
-            rayon = max(distances) if distances else 0
-            rayon = round(rayon + marge_minimale)
-
-            zone["centre_rgb"] = centre
-            zone["rayon"] = rayon
-
-        return zones
-
-def detecter_couleur(self, pied="left"):
-    valeur_hex = self.lire_hex_capteur(pied)
-    valeur_hex = self.nettoyer_hex(valeur_hex)
-
-    rgb_lu = self.hex_vers_rgb(valeur_hex)
-    zones = self.calculer_zones()
-
-    meilleure_couleur = None
-    meilleure_distance = float("inf")
-
-    for nom, zone in zones.items():
-        distance = self.distance_rgb(rgb_lu, zone["centre_rgb"])
-
-        if distance <= zone["rayon"] and distance < meilleure_distance:
-            meilleure_couleur = nom
-            meilleure_distance = distance
-
-    if meilleure_couleur is None:
-        return "inconnue"
-
-    return meilleure_couleur
-
-    def sauvegarder(self):
-        zones = self.calculer_zones()
-
-        with open(self.nom_fichier, "w", encoding="utf-8") as fichier:
-            fichier.write("Calibration des couleurs Marty\n")
-            fichier.write(f"Date : {datetime.now()}\n")
-            fichier.write("=" * 40 + "\n\n")
-
-            fichier.write("MESURES BRUTES\n")
-            fichier.write("=" * 40 + "\n\n")
-
-            for mesure in self.resultats:
-                fichier.write(f"Couleur #{mesure['numero']}\n")
-                fichier.write(f"Nom : {mesure['nom']}\n")
-                fichier.write(f"Condition : {mesure['condition']}\n")
-                fichier.write(f"Valeur HEX : {mesure['hex']}\n")
-                fichier.write("-" * 30 + "\n")
-
-            fichier.write("\n\nZONES DE RECONNAISSANCE\n")
-            fichier.write("=" * 40 + "\n\n")
-
-            for nom, zone in zones.items():
-                fichier.write(f"Nom : {nom}\n")
-                fichier.write(f"Centre RGB : {zone['centre_rgb']}\n")
-                fichier.write(f"Rayon : {zone['rayon']}\n")
-                fichier.write(f"Mesures RGB : {zone['mesures_rgb']}\n")
-                fichier.write("-" * 30 + "\n")
-
-        return self.nom_fichier
+    detected_color = calibrateur.trouver_couleur_depuis_hex("#c54949", 80)
+    print(detected_color)
