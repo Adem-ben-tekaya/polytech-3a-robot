@@ -1,3 +1,7 @@
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+
 from datetime import datetime
 from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel,    
                             QPushButton, QTableWidget, QTableWidgetItem, QTextEdit,
@@ -175,7 +179,10 @@ class FenetrePrincipale(QMainWindow):
     def demarrer_serveur(self):
         self.port_actuel = int(self.spin_port.text())   # On sauvegarde le port avant de désactiver le champ
         commande = 'netsh advfirewall firewall add rule name="Flask ' + str(self.port_actuel) + '" dir=in action=allow protocol=TCP localport=' + str(self.port_actuel)
-        subprocess.run(commande, shell=True)
+        try:
+            subprocess.run(commande, shell=True, check=True)
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            pass
         self.flask_thread = FlaskThread(self.port_actuel)
         self.flask_thread.start()
         self.btn_start.setEnabled(False)
@@ -184,7 +191,10 @@ class FenetrePrincipale(QMainWindow):
 
     def arreter_serveur(self):
         commande = 'netsh advfirewall firewall delete rule name="Flask ' + str(self.port_actuel) + '"'
-        subprocess.run(commande, shell=True)
+        try:
+            subprocess.run(commande, shell=True, check=True)
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            pass
         if self.flask_thread:
             self.flask_thread.stop()
             self.flask_thread.wait(2000)
@@ -282,5 +292,8 @@ class FenetrePrincipale(QMainWindow):
             self.flask_thread.stop()
             self.flask_thread.wait(2000)
         commande = 'netsh advfirewall firewall delete rule name="Flask ' + str(self.port_actuel) + '"'
-        subprocess.run(commande, shell=True)
+        try:
+            subprocess.run(commande, shell=True, check=True)
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            pass
         event.accept()

@@ -10,7 +10,6 @@ FICHIER_CLASSEMENT = "classement.json"
 def lister_robots():
     if not robots_connus:
         print("Aucun robot enregistré !")
-        exit
     else:
         print("Robots connus :")
         for info in robots_connus:
@@ -92,10 +91,10 @@ def calculer_points(couleur, bras, exp):
     if couleur not in regles_battle:
         return 0
 
-    ce_que_le_robot_a_fait = []
-    ce_que_le_robot_a_fait.append(exp)
-    for mouvement in bras.split('+'):
-        ce_que_le_robot_a_fait.append(mouvement.strip())
+    ce_que_le_robot_a_fait = [exp]
+    if bras != '':
+        for mouvement in bras.split('+'):
+            ce_que_le_robot_a_fait.append(mouvement.strip())
 
     total = 0
 

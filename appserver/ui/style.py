@@ -119,4 +119,5 @@ COLOR_MAP = {
     'Y': ('#f1c40f', 'JAUNE'),
     'C': ('#1abc9c', 'CYAN'),
     'G': ('#27ae60', 'VERT'),
+    'R': ("#c92323", 'ROUGE'),
 }
