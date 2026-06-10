@@ -20,7 +20,7 @@ class ConnexionServeur:
         """
         self._check_url()
 
-        reponse = requests.get(f"{self.url_serveur}/", timeout=5)
+        reponse = requests.get(f"{self.url_serveur}/", timeout=3)
         reponse.raise_for_status()
 
         return reponse.text

@@ -10,6 +10,8 @@ _MARTY_KEYWORDS = ('marty', 'ric', 'robotical')
 _SCAN_TIMEOUT = 0.5 #Anciennement 1.5
 # Nombre maximum de threads parallèles lors du scan
 _MAX_THREADS = 64
+# Stocke les eventuels serveur trouvés
+_SERVERS_DISCOVERED = []
 
 
 class ConnexionMarty:
@@ -92,57 +94,67 @@ class ConnexionMarty:
 
 
     def rechercher_martys(self, reseau: str, debut: int = 1, fin: int = 254) -> list:
-        """
-        Scanne les adresses {reseau}.{debut} … {reseau}.{fin} via HTTP.
-
-        Retourne une liste de dicts : [{'nom': str, 'ip': str}, ...]
-        """
         resultats = []
         lock = threading.Lock()
 
         def sonder(i):
             ip = f"{reseau}.{i}"
-            nom, est_marty = self._sonder_http(ip)
-            if est_marty:
+            resultat = self._sonder_http(ip)
+
+            if resultat is not None:
                 with lock:
-                    resultats.append({'nom': f'[Marty] {nom}', 'ip': ip})
+                    resultats.append(resultat)
 
         threads = []
-        import time
-        for i in range(debut, fin  +1):
+
+        for i in range(debut, fin + 1):
             t = threading.Thread(target=sonder, args=(i,), daemon=True)
             threads.append(t)
             t.start()
-            # Limite le nombre de threads actifs simultanément
+
             while sum(1 for th in threads if th.is_alive()) >= _MAX_THREADS:
-                time.sleep(0.005)
+                pass
+
         for t in threads:
             t.join()
 
         return resultats
 
-    @staticmethod
-    def _sonder_http(ip: str):
-        """
-        Tente un GET HTTP sur l'IP.
+@staticmethod
+def _sonder_http(ip: str):
+    url = f"http://{ip}:8080/"
 
-        Retourne (nom_affichage, est_marty).
-        nom_affichage est '' si l'hôte est injoignable.
-        """
-        url = f'http://{ip}/'
-        try:
-            req = urllib.request.Request(url)
-            req.add_header('Connection', 'close')
-            with urllib.request.urlopen(req, timeout=_SCAN_TIMEOUT) as resp:
-                server  = (resp.getheader('Server') or '').lower()
-                content = resp.read(256).decode('utf-8', errors='ignore').lower()
-                est_marty = any(
-                    kw in server or kw in content for kw in _MARTY_KEYWORDS
-                )
-                nom = ip
-                return nom, est_marty
-        except urllib.error.HTTPError:
-            # Le serveur répond (4xx/5xx) mais n'est probablement pas un Marty
-            return ip, False
-        except Exception:
-            return '', False
+    try:
+        req = urllib.request.Request(url)
+        req.add_header("Connection", "close")
+
+        with urllib.request.urlopen(req, timeout=_SCAN_TIMEOUT) as resp:
+            code = resp.getcode()
+            server = (resp.getheader("Server") or "").lower()
+            content = resp.read(256).decode("utf-8", errors="ignore").strip()
+
+            est_marty = any(
+                kw in server or kw in content.lower()
+                for kw in _MARTY_KEYWORDS
+            )
+
+            # Cas serveur REST : GET / renvoie une version, ex "1.2"
+            if code == 200 and content:
+                return {
+                    "type": "serveur",
+                    "nom": f"Serveur REST v{content}",
+                    "ip": ip
+                }
+
+            # Cas Marty
+            if est_marty:
+                return {
+                    "type": "marty",
+                    "nom": f"[Marty] {ip}",
+                    "ip": ip
+                }
+
+    except Exception:
+        pass
+
+    return None
