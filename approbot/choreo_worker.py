@@ -1,6 +1,6 @@
 import time
 from PyQt6.QtCore import QObject, pyqtSignal
-
+from dance_parser import parse
 
 class ChoreoWorker(QObject):
     """Exécute une chorégraphie pas à pas dans un QThread.
@@ -32,7 +32,7 @@ class ChoreoWorker(QObject):
         if isinstance(dance_or_dance_file_path, dict):
             self._dance = dance_or_dance_file_path
         else:
-            self._dance = charger_dance(dance_or_dance_file_path)
+            self._dance = parse(dance_or_dance_file_path)
 
 
     def stop(self):
@@ -76,7 +76,8 @@ class ChoreoWorker(QObject):
                     self.log.emit(f"  Couleur détectée : {couleur_lue} -> code {couleur}")
 
                 else :
-                    couleur = 'N'
+                    couleurs_offline = ["N", "R", "B", "G", "Y"]
+                    couleur = couleurs_offline[step % len(couleurs_offline)]
                     self.log.emit("  Mode offline (Marty non conecté) : couleur forcée à N")
                 
 
