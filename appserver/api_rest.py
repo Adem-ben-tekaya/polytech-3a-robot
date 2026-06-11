@@ -6,6 +6,8 @@ Le serveur, lui, écoute sur le port choisi, donc on ajoute temporairement
 une règle pare-feu limitée au réseau privé local.
 """
 from gestion_battle import (
+    robots_connus,
+    regles_battle,
     lister_robots,
     afficher_reception,
     afficher_reception,
