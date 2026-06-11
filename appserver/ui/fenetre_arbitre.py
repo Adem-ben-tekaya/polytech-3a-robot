@@ -3,17 +3,37 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from datetime import datetime
-from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel,    
-                            QPushButton, QTableWidget, QTableWidgetItem, QTextEdit,
-                            QFileDialog, QHeaderView, QFrame, QSplitter, QStatusBar, QLineEdit)
+from PyQt6.QtWidgets import (
+    QMainWindow, 
+    QWidget, 
+    QVBoxLayout, 
+    QHBoxLayout, 
+    QLabel,    
+    QPushButton, 
+    QTableWidget, 
+    QTableWidgetItem, 
+    QTextEdit,
+    QFileDialog, 
+    QHeaderView, 
+    QFrame, 
+    QSplitter, 
+    QStatusBar, 
+    QLineEdit
+    )
+
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QColor, QTextCursor
-from gestion_battle import robots_connus, charger_battle, charger_classement
+from gestion_battle import (
+    robots_connus, 
+    charger_battle, 
+    charger_classement
+)
+
 from signaux import signals
 from api_rest import FlaskThread
 from ui.style import COLOR_MAP
 import socket
-import subprocess
+import ctypes
 
 
 class FenetrePrincipale(QMainWindow):
@@ -176,29 +196,74 @@ class FenetrePrincipale(QMainWindow):
         signals.serveur_demarre.connect(self.serveur_demarre)
         signals.serveur_arrete.connect(self.serveur_arrete)
 
+
+    def executer_commande_admin(self, commande: str) -> bool:
+        """
+        Lance une commande Windows avec élévation UAC.
+
+        Retourne True si Windows accepte de lancer la commande,
+        False si l'utilisateur annule ou si l'appel échoue.
+        """
+        resultat = ctypes.windll.shell32.ShellExecuteW(
+            None,
+            "runas",
+            "cmd.exe",
+            f"/c {commande}",
+            None,
+            1
+        )
+
+        return resultat > 32
+
     def demarrer_serveur(self):
         self.port_actuel = int(self.spin_port.text())   # On sauvegarde le port avant de désactiver le champ
-        commande = 'netsh advfirewall firewall add rule name="Flask ' + str(self.port_actuel) + '" dir=in action=allow protocol=TCP localport=' + str(self.port_actuel)
-        try:
-            subprocess.run(commande, shell=True, check=True)
-        except (subprocess.CalledProcessError, FileNotFoundError):
-            pass
+        nom_regle = f'Marty Supreme Server {self.port_actuel}'
+        commande = (
+                f'netsh advfirewall firewall add rule '
+                f'name="{nom_regle}" '
+                f'dir=in '
+                f'action=allow '
+                f'protocol=TCP '
+                f'localport={self.port_actuel} '
+                f'profile=private '
+                f'remoteip=localsubnet'
+            )
+
+        ok = self.executer_commande_admin(commande)
+
+        if not ok:
+            self._log("Autorisation pare-feu annulée ou refusée.", "#e74c3c")
+            return
+
+        self._log("Demande d'autorisation pare-feu envoyée.", "#2ecc71")
+
         self.flask_thread = FlaskThread(self.port_actuel)
         self.flask_thread.start()
+
         self.btn_start.setEnabled(False)
         self.btn_stop.setEnabled(True)
         self.spin_port.setEnabled(False)
 
     def arreter_serveur(self):
-        commande = 'netsh advfirewall firewall delete rule name="Flask ' + str(self.port_actuel) + '"'
-        try:
-            subprocess.run(commande, shell=True, check=True)
-        except (subprocess.CalledProcessError, FileNotFoundError):
-            pass
         if self.flask_thread:
             self.flask_thread.stop()
-            self.flask_thread.wait(2000)
+            self.flask_thread.wait(3000)
             self.flask_thread = None
+
+        nom_regle = f"Marty Supreme Server {self.port_actuel}"
+
+        commande = (
+            f'netsh advfirewall firewall delete rule '
+            f'name="{nom_regle}"'
+        )
+
+        ok = self.executer_commande_admin(commande)
+
+        if ok:
+            self._log("Demande de suppression de la règle pare-feu envoyée.", "#2ecc71")
+        else:
+            self._log("Suppression pare-feu annulée ou refusée.", "#e74c3c")
+
         self.btn_start.setEnabled(True)
         self.btn_stop.setEnabled(False)
         self.spin_port.setEnabled(True)
@@ -289,11 +354,6 @@ class FenetrePrincipale(QMainWindow):
 
     def closeEvent(self, event):
         if self.flask_thread and self.flask_thread.isRunning():
-            self.flask_thread.stop()
-            self.flask_thread.wait(2000)
-        commande = 'netsh advfirewall firewall delete rule name="Flask ' + str(self.port_actuel) + '"'
-        try:
-            subprocess.run(commande, shell=True, check=True)
-        except (subprocess.CalledProcessError, FileNotFoundError):
-            pass
+            self.arreter_serveur()
+
         event.accept()

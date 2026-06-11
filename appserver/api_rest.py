@@ -1,5 +1,18 @@
 from flask import Flask, request, jsonify
-from gestion_battle import *
+"""
+L'application arbitre utilise Flask pour exposer une API REST accessible aux applications joueur. 
+Le joueur n'ouvre pas de port : il envoie seulement des requêtes. 
+Le serveur, lui, écoute sur le port choisi, donc on ajoute temporairement 
+une règle pare-feu limitée au réseau privé local.
+"""
+from gestion_battle import (
+    lister_robots,
+    afficher_reception,
+    afficher_reception,
+    afficher_scores,
+    calculer_points,
+    mettre_a_jour_classement
+)
 import uuid
 import logging
 from PyQt6.QtCore import QThread
@@ -220,6 +233,18 @@ class FlaskThread(QThread):
         self._server = make_server('0.0.0.0', self.port, app)
         signals.serveur_demarre.emit(self.port)     
         self._server.serve_forever()
+
+    def closeEvent(self, event):
+        try:
+            if self.flask_thread is not None and self.flask_thread.isRunning():
+                print("Arrêt du serveur Flask...")
+                self.flask_thread.stop()
+                self.flask_thread.wait(3000)
+                print("Serveur Flask arrêté.")
+        except Exception as e:
+            print(f"Erreur arrêt serveur : {e}")
+
+        event.accept()
 
     def stop(self):
         """
