@@ -1,7 +1,9 @@
+from datetime import datetime
 import json
 import os
 import math
-from datetime import datetime
+import time
+from random import randint
 
 FICHIER_CALIBRATION_DEFAUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "calibration_couleurs.json")
 
@@ -91,7 +93,7 @@ class CalibrateurCouleurs:
         valeur_hex = self.nettoyer_hex(valeur_hex)
         rgb_lu = self.hex_vers_rgb(valeur_hex)
 
-        meilleure_couleur = "inconnue/couleur par defaut"
+        meilleure_couleur = ""
         meilleure_distance = float("inf")
 
         for mesure in self.mesures:
@@ -103,9 +105,9 @@ class CalibrateurCouleurs:
                 meilleure_couleur = mesure["couleur"]
 
         if meilleure_distance > seuil_max:
-            return "inconnue/seuil depasse"
+            return "inconnue", round(meilleure_distance, 2)
 
-        return meilleure_couleur
+        return meilleure_couleur, round(meilleure_distance, 2)
     
     # Gestion du fichier de calibration
     def sauvegarder_calibration(self):
@@ -180,6 +182,13 @@ class CalibrateurCouleurs:
             (rgb1[2] - rgb2[2]) ** 2
         )
     
+    def generer_hex(self):
+        """
+        Outil de debug et de test qui 
+        génère une couleur aléatoire
+        """
+        return "#{:06x}".format(randint(0, 0xFFFFFF))
+    
 if __name__ == "__main__":
     calibrateur = CalibrateurCouleurs(connexion=None)
     for color,hex_color in [
@@ -200,5 +209,9 @@ if __name__ == "__main__":
         )
         print(mesure)
 
-    detected_color = calibrateur.trouver_couleur_depuis_hex("#c54949", 80)
-    print(detected_color)
+    while True:
+        random_hex = calibrateur.generer_hex()
+        results = calibrateur.trouver_couleur_depuis_hex(random_hex, 80)
+        # guess, distance = 
+        print(f"For {random_hex} the guess is {results[0]} avec une distance de {results[1]}")
+        time.sleep(0.1)
