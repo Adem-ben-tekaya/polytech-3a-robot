@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QListWidget, QListWidgetItem, QApplication)
-from approbot.server_gets import RequetesServeur
+from approbot.server_gets import ServerGets
 import threading
 
 
@@ -108,7 +108,7 @@ class OngletArbitre(QWidget):
 
         def sonder(i):
             ip = f"{reseau}.{i}"
-            resultat = RequetesServeur.sonder_serveur(ip)
+            resultat = ServerGets.sonder_serveur(ip)
             if resultat:
                 with lock:
                     serveurs.append(resultat)

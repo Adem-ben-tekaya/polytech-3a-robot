@@ -20,13 +20,14 @@ from PyQt6.QtWidgets import (
 #BACK-END IMPORTS#
 from approbot.calibrateur_couleurs import CalibrateurCouleurs
 from approbot.connexion_marty import ConnexionMarty
-from approbot.server_gets import RequetesServeur
+from approbot.server_gets import ServerGets
 
 #FRONT-END IMPORTS#
 from ui.connexion import OngletConnexion
 from ui.calibration import OngletCalibration
 from ui.joueur import OngletJoueur
 from ui.arbitre import OngletArbitre
+from ui.style import STYLE
 
 
 class MartySupreme(QWidget):
@@ -34,7 +35,7 @@ class MartySupreme(QWidget):
         super().__init__()
 
         self.connexion = ConnexionMarty()
-        self.serveur = RequetesServeur()
+        self.serveur = ServerGets()
         self.calibration = CalibrateurCouleurs(self.connexion)
 
         self.setWindowTitle("Marty Supreme")
@@ -56,7 +57,7 @@ class MartySupreme(QWidget):
         )
 
         self.tabs.addTab(
-            OngletJoueur(self.connexion, self.calibration),
+            OngletJoueur(self.connexion, self.calibration, self.serveur),
             "Joueur"
         )
 
@@ -70,15 +71,21 @@ class MartySupreme(QWidget):
         self.setLayout(layout)
 
     def closeEvent(self, event):
+        print("Fermeture de l'app")
+        print("Serveur URL :", self.serveur.url_serveur)
+        print("Serveur RID :", self.serveur.rid)
+
         try:
             self.connexion.deconnecter()
-        except Exception:
-            pass
+            print("Marty déconnecté")
+        except Exception as e:
+            print("Erreur déconnexion Marty :", e)
 
         try:
             self.serveur.deconnecter()
-        except Exception:
-            pass
+            print("Serveur déconnecté")
+        except Exception as e:
+            print("Erreur déconnexion serveur :", e)
 
         event.accept()
 
@@ -90,85 +97,7 @@ if __name__ == "__main__":
 
     app.setFont(QFont("Segoe UI", 10))
 
-    app.setStyleSheet("""
-        QWidget {
-            background-color: #1e1e2f;
-            color: #f5f5f5;
-        }
-
-        QTabWidget::pane {
-            border: 1px solid #444;
-            border-radius: 8px;
-            padding: 6px;
-        }
-
-        QTabBar::tab {
-            background: #2b2b40;
-            color: #dddddd;
-            padding: 10px 18px;
-            border-top-left-radius: 8px;
-            border-top-right-radius: 8px;
-            margin-right: 3px;
-        }
-
-        QTabBar::tab:selected {
-            background: #4b6cff;
-            color: white;
-        }
-
-        QGroupBox {
-            border: 1px solid #5d5d7a;
-            border-radius: 10px;
-            margin-top: 12px;
-            padding: 12px;
-            font-weight: bold;
-        }
-
-        QGroupBox::title {
-            subcontrol-origin: margin;
-            left: 12px;
-            padding: 0 6px;
-        }
-
-        QPushButton {
-            background-color: #4b6cff;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 9px;
-        }
-
-        QPushButton:hover {
-            background-color: #6f86ff;
-        }
-
-        QPushButton:pressed {
-            background-color: #324bd6;
-        }
-
-        QLineEdit {
-            background-color: #2b2b40;
-            color: white;
-            border: 1px solid #5d5d7a;
-            border-radius: 8px;
-            padding: 8px;
-        }
-
-        QListWidget {
-            background-color: #2b2b40;
-            border: 1px solid #5d5d7a;
-            border-radius: 8px;
-            padding: 6px;
-        }
-
-        QListWidget::item {
-            padding: 8px;
-        }
-
-        QListWidget::item:selected {
-            background-color: #4b6cff;
-        }
-        """)
+    app.setStyleSheet(STYLE)
 
     window = MartySupreme()
     window.show()

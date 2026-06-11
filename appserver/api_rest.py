@@ -96,22 +96,40 @@ def obtenir_score():            #Renvoie le score total d'un robot
 
 
 @app.route('/bye', methods=['POST'])
-def deconnecter_robot():            #Le robot se déconnecte et on affiche son score final et on le retire de la liste
-    donnees = request.json
-    identifiant_robot = donnees.get('rid')
+def deconnecter_robot():
+    """
+    Lorsque le robot se déconnecte,
+    on affiche son score final
+    et on le retire de la liste
+    """
+    data = request.json or {}
+    rid = data.get('rid')
+
+    if not rid:
+        return jsonify({'error': 'rid manquant'}), 400
+    
     robot_trouve = None
+
     for info in robots_connus:
-        if info[0] == identifiant_robot:
+        if info[0] == rid:
             robot_trouve = info
+            break
+    
+
     if robot_trouve is None:
         return jsonify({'error': 'Robot inconnu'}), 404
-    print(f"Robot = {identifiant_robot} se déconnecte. Score final = {robot_trouve[2]}")
-    afficher_scores()
+    
+    print(f"Robot = {rid} se déconnecte. Score final = {robot_trouve[2]}")
+
     mettre_a_jour_classement(robot_trouve[1], robot_trouve[2])
     robots_connus.remove(robot_trouve)
-    signals.robot_deconnecte.emit(identifiant_robot)    
+
+    afficher_scores()
+
+    signals.robot_deconnecte.emit(rid)    
     signals.score_mis_a_jour.emit()
-    return jsonify({}), 200
+
+    return jsonify({"status": "ok"}), 200
 
 
 class FlaskThread(QThread):
@@ -130,35 +148,4 @@ class FlaskThread(QThread):
     def stop(self):
         if self._server:
             self._server.shutdown()
-        signals.serveur_arrete.emit()              
-
-
-'''
-def main():
-    subprocess.run('netsh advfirewall firewall add rule name="Flask 8080" dir=in action=allow protocol=TCP localport=8080', shell=True)
-    #Lecture des arguments de la ligne de commande
-    parser = argparse.ArgumentParser(description='Serveur Arbitre - Dance Battle')
-    parser.add_argument('--battle', type=str, default=None, help='Chemin vers le fichier .battle à charger au démarrage')
-    parser.add_argument('--port', type=int, default=8080, help="Port d'écoute du serveur HTTP")
-    args = parser.parse_args()
-
-    if args.battle:
-        print(f"\nChargement du fichier .battle : {args.battle}")
-        charger_battle(args.battle)
-    else:
-        print("\nAucun fichier .battle fourni. Les scores seront toujours 0.")
-
-    print(f"Serveur démarré sur le port {args.port}")
-
-    try:
-        app.run(host='0.0.0.0', port=args.port, debug=False, use_reloader=False)
-    except KeyboardInterrupt:
-        print("\nServeur arrêté.")
-        subprocess.run('netsh advfirewall firewall delete rule name="Flask 8080"', shell=True)
-        afficher_scores()
-        sys.exit(0)
-
-
-if __name__ == '__main__':
-    main()
-'''
+        signals.serveur_arrete.emit()

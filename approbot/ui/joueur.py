@@ -10,11 +10,12 @@ from PyQt6.QtWidgets import (
 from approbot.mouvement_marty import MouvementMarty
 
 class OngletJoueur(QWidget):
-    def __init__(self, connexion, calibrateur):
+    def __init__(self, connexion, calibrateur, serveur):
         super().__init__()
 
         self.connexion = connexion
         self.calibrateur = calibrateur
+        self.serveur = serveur
         self.mouvement = MouvementMarty(connexion, calibrateur)
 
         layout = QVBoxLayout()

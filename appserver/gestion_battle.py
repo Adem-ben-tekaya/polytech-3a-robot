@@ -4,7 +4,8 @@ import os
 robots_connus = []
 regles_battle = {}
 
-FICHIER_CLASSEMENT = "classement.json"
+DOSSIER_ACTUEL = os.path.dirname(os.path.abspath(__file__))
+FICHIER_CLASSEMENT = os.path.join(DOSSIER_ACTUEL, "classement.json")
 
 
 def lister_robots():
@@ -22,14 +23,19 @@ def afficher_reception(couleur, bras, exp, points):
 
 def afficher_scores():
     print("Scores :")
+
     if not robots_connus:
         print("Aucun robot enregistré !")
-    else:
-        classement = sorted(robots_connus, key=lambda x: x[2], reverse=True)    #Tri par score décroissant
-        i=1
-        for info in classement:
-            print(f" #{i}, ID : {info[0]}, Nom : {info[1]}, Score : {info[2]}")
-            i=i+1
+        return
+    
+    classement = sorted(
+        robots_connus, 
+        key=lambda x: x[2], 
+        reverse=True #Tri par score décroissant
+        )
+    
+    for i,info in enumerate(classement,start=1):
+        print(f" #{i}, ID : {info[0]}, Nom : {info[1]}, Score : {info[2]}")
 
 
 def charger_battle(chemin_fichier):

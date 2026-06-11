@@ -1,6 +1,6 @@
 import requests
 
-class RequetesServeur:
+class ServerGets:
     def __init__(self):
         self.url_serveur = None
         self.rid = None
@@ -152,12 +152,15 @@ class RequetesServeur:
         donnees = {
             "rid": self.rid
         }
+        print("Envoi /bye avec :", donnees)
 
         reponse = requests.post(
             f"{self.url_serveur}/bye",
             json=donnees,
             timeout=3
         )
+        print("Réponse /bye :", reponse.status_code, reponse.text)
+
         reponse.raise_for_status()
 
         self.rid = None
@@ -187,12 +190,17 @@ class RequetesServeur:
         
     def deconnecter(self):
         if not self.est_enregistre():
-            return
+            print("Aucun rid enregistré, pas de /bye à envoyer.")
+            return False
 
         try:
             self.bye()
-        except Exception:
-            pass
+            print("Requête /bye envoyée avec succès.")
+            return True
+
+        except Exception as e:
+            print(f"Erreur pendant /bye : {e}")
+            return False
 
 
     def est_enregistre(self):
@@ -207,7 +215,7 @@ class RequetesServeur:
             raise RuntimeError("Robot non enregistré. Il faut appeler hello() avant.")
         
 if __name__ == "__main__":
-    serveur = RequetesServeur()
+    serveur = ServerGets()
 
     serveur.definir_url("192.168.1.7")
 

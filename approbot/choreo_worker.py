@@ -252,11 +252,11 @@ def lancer_battle_console(ip_marty, ip_serveur, fichier_dance, nom_robot="Marty"
     from approbot.connexion_marty import ConnexionMarty
     from approbot.calibrateur_couleurs import CalibrateurCouleurs
     from approbot.mouvement_marty import MouvementMarty
-    from approbot.server_gets import RequetesServeur
+    from approbot.server_gets import ServerGets
 
     connexion = None
     mouvement = None
-    serveur = RequetesServeur()
+    serveur = ServerGets()
 
     try:
         dance = charger_dance(fichier_dance)
