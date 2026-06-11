@@ -33,7 +33,10 @@ class RequetesServeur:
 
         try:
             data = reponse.json()
-            self.rid = data.get("rid")
+            if isinstance(data, dict):
+                self.rid = data.get("rid")
+            else:
+                self.rid = str(data)
 
         except Exception:
             self.rid = reponse.text.strip()
