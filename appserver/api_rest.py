@@ -7,18 +7,27 @@ from signaux import signals
 
 
 app = Flask(__name__)
-app.logger.disabled = True          # Désactive les logs Flask pour ne pas polluer la console
+app.logger.disabled = True          #Désactive les logs Flask pour ne pas polluer la console
 logging.getLogger('werkzeug').setLevel(logging.ERROR)
 
 
 @app.route('/', methods=['GET'])
-def ping():         #Vérifie que le serveur est disponible et renvoie simplement le numéro de version
+def ping():
+    """
+    Vérifie que le serveur est disponible 
+    et renvoie simplement le numéro de version
+    """
     print("Ping reçu")
-    return jsonify({'version': '1.2'}), 200
+    return jsonify({'version': '1.67'}), 200
 
 
 @app.route('/hello', methods=['POST'])
-def enregistrer_robot():            #Enregistre un nouveau robot et lui attribue un identifiant unique et renvoie cet identifiant au robot
+def enregistrer_robot():   
+    """
+    Enregistre un nouveau robot et 
+    lui attribue un identifiant unique et 
+    renvoie cet identifiant au robot
+    """
     nouvel_identifiant = uuid.uuid4().hex[:6].upper()
     ip_robot = request.remote_addr
     robots_connus.append([nouvel_identifiant, ip_robot, 0])
@@ -31,6 +40,10 @@ def enregistrer_robot():            #Enregistre un nouveau robot et lui attribue
 
 @app.route('/name', methods=['POST'])
 def recevoir_nom_robot():
+    """
+    Donne la possiblilité à un robot de se donner un 
+    nom personnalisé
+    """
     donnees = request.json
     identifiant_robot = donnees.get('rid')
     nom_robot = donnees.get('name')
@@ -45,7 +58,11 @@ def recevoir_nom_robot():
 
 
 @app.route('/start', methods=['POST'])
-def demarrer_choregraphie():            #Le robot annonce qu'il commence sa chorégraphie et on lui répond avec le nombre de mouvements qu'il doit effectuer
+def demarrer_choregraphie():
+    """
+    Le robot annonce qu'il commence sa chorégraphie et 
+    on lui répond avec le nombre de mouvements qu'il doit effectuer
+    """
     donnees = request.json          #Lit automatiquement le corps JSON de la requête
     identifiant_robot = donnees.get('rid')
     robot_trouve = None
@@ -60,7 +77,12 @@ def demarrer_choregraphie():            #Le robot annonce qu'il commence sa chor
 
 
 @app.route('/step', methods=['POST'])
-def recevoir_pas():         #Le robot envoie les infos d'un pas effectué et on calcule les points, on met à jour le score, on renvoie les points obtenus
+def recevoir_pas():
+    """
+    Le robot envoie les infos d'un pas effectué et 
+    on calcule les points, on met à jour le score, 
+    on renvoie les points obtenus
+    """
     donnees = request.json
     identifiant_robot = donnees.get('rid')
     couleur = donnees.get('col', '')
@@ -81,7 +103,10 @@ def recevoir_pas():         #Le robot envoie les infos d'un pas effectué et on 
 
 
 @app.route('/score', methods=['GET'])
-def obtenir_score():            #Renvoie le score total d'un robot
+def obtenir_score():
+    """
+    Renvoie le score total d'un robot
+    """
     identifiant_robot = request.args.get('rid')             #Lit les paramètres dans l'URL
     robot_trouve = None
     for info in robots_connus:
@@ -133,19 +158,89 @@ def deconnecter_robot():
 
 
 class FlaskThread(QThread):
+    """
+    Thread PyQt permettant d'exécuter le serveur Flask sans bloquer l'interface graphique.
+
+    Cette classe encapsule le serveur WSGI Werkzeug utilisé par Flask.
+    Elle démarre le serveur REST sur toutes les interfaces réseau de la machine
+    grâce à l'adresse '0.0.0.0'.
+
+    Attributs :
+        port (int) :
+            Port TCP sur lequel le serveur Flask doit écouter.
+            Exemple : 8080.
+
+        _server :
+            Instance du serveur Werkzeug créée avec make_server.
+            Vaut None tant que le serveur n'a pas encore été lancé.
+    """
 
     def __init__(self, port: int):
+        """
+        Initialise le thread Flask.
+
+        Paramètres :
+            port (int) :
+                Numéro du port sur lequel le serveur Flask sera lancé.
+
+        Effets :
+            - initialise le QThread ;
+            - mémorise le port demandé ;
+            - prépare l'attribut _server, qui contiendra plus tard le serveur Werkzeug.
+        """
         super().__init__()
         self.port = port
         self._server = None
 
     def run(self):
+        """
+        Lance le serveur Flask dans le thread.
+
+        Cette méthode est automatiquement exécutée lorsque start() est appelé
+        sur l'objet FlaskThread.
+
+        Effets :
+            - crée un serveur Werkzeug associé à l'application Flask ;
+            - écoute sur l'adresse '0.0.0.0' afin d'être accessible depuis le réseau ;
+            - émet le signal serveur_demarre avec le port utilisé ;
+            - bloque ce thread avec serve_forever(), sans bloquer l'interface PyQt.
+
+        Précondition :
+            - l'application Flask app doit être définie ;
+            - le port doit être disponible.
+
+        Postcondition :
+            - le serveur REST est lancé et accepte les requêtes HTTP.
+
+        Exceptions possibles :
+            - erreur si le port est déjà utilisé ;
+            - erreur si le pare-feu ou le système empêche l'ouverture du port.
+        """
         from werkzeug.serving import make_server
         self._server = make_server('0.0.0.0', self.port, app)
         signals.serveur_demarre.emit(self.port)     
         self._server.serve_forever()
 
     def stop(self):
+        """
+        Arrête proprement le serveur Flask.
+
+        Effets :
+            - si le serveur Werkzeug existe, appelle shutdown() pour arrêter l'écoute HTTP ;
+            - émet le signal serveur_arrete pour prévenir l'interface graphique.
+
+        Précondition :
+            - le serveur peut avoir été lancé ou non.
+
+        Postcondition :
+            - si le serveur était actif, il est arrêté ;
+            - l'interface est informée de l'arrêt du serveur.
+
+        Remarque :
+            Cette méthode peut être appelée depuis l'interface PyQt, par exemple
+            lorsqu'un bouton "Arrêter serveur" est pressé ou lors de la fermeture
+            de l'application arbitre.
+        """
         if self._server:
             self._server.shutdown()
         signals.serveur_arrete.emit()
