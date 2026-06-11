@@ -6,8 +6,8 @@ ARM_UP           = 100
 ARM_BACK         = -100
 STEP_LENGTH      = 40
 STEP_TIME_MS     = 1500
-SIDE_STEP_LENGTH = 100
-SIDE_STEP_TIME   = 200
+SIDE_STEP_LENGTH = 500
+SIDE_STEP_TIME   = 600
 
 
 class MouvementMarty:
@@ -39,9 +39,6 @@ class MouvementMarty:
             elif direction == 'R':
                 marty.sidestep('right', step_length=SIDE_STEP_LENGTH, move_time=SIDE_STEP_TIME)
 
-    # ------------------------------------------------------------------
-    # Bras
-    # ------------------------------------------------------------------
 
     def set_bras(self, tokens: list) -> None:
         """Positionne les bras selon les tokens reçus.
@@ -64,9 +61,6 @@ class MouvementMarty:
         elif 'ARB' in tokens:
             marty.move_joint(JOINT_RIGHT_ARM, ARM_BACK, STEP_TIME_MS)
 
-    # ------------------------------------------------------------------
-    # Expression
-    # ------------------------------------------------------------------
 
     def set_expression(self, token: str) -> None:
         if not self._connexion.is_connected():
@@ -152,7 +146,7 @@ class MouvementMarty:
         return (r, g, b)
     
     def get_couleur(self, pied="left"):
-        return self._calibrateur.detecter_couleur(pied)
+        return self._calibrateur.get_couleur(pied)
     
     def get_batterie(self) -> float:
         """Retourne le pourcentage de batterie restant, ou -1 si déconnecté."""
