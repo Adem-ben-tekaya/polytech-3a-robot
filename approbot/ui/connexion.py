@@ -6,7 +6,8 @@ from PyQt6.QtWidgets import (
     QLineEdit,
     QPushButton,
     QListWidget,
-    QListWidgetItem
+    QListWidgetItem,
+    QApplication
 )
 
 
@@ -73,7 +74,8 @@ class OngletConnexion(QWidget):
             return
 
         self.liste_martys.clear()
-        self.label_statut.setText(f"Recherche sur {reseau}.x...")
+        self.label_statut.setText(f"Recherche dans {reseau}.X en cours.")
+        QApplication.processEvents()
 
         try:
             martys = self.connexion.rechercher_martys(reseau)
@@ -108,7 +110,7 @@ class OngletConnexion(QWidget):
             self.connexion.connecter(ip)
             self.label_statut.setText(f"Connecté à Marty : {ip}")
         except Exception as e:
-            self.label_statut.setText(f"Erreur connexion : {e}")
+            self.label_statut.setText(e)
 
     def deconnecter(self):
         try:

@@ -1,15 +1,12 @@
 import requests
 
-MARTY_NAME = "MATHILDE PANOT"
-IP_SERVEUR = "10.170.49.21" #TODO
-
 class RequetesServeur:
     def __init__(self):
         self.url_serveur = None
         self.rid = None
 
-    def definir_url(self):
-        ip_server= IP_SERVEUR #TODO
+    def definir_url(self,ip):
+        ip_server= ip
         url_serveur = "http://"+ip_server+":8080"
         self.url_serveur = url_serveur.rstrip("/")
 
@@ -27,18 +24,21 @@ class RequetesServeur:
 
     def hello(self):
         self._check_url()
-        reponse = requests.post(f"{self.url_serveur}/hello",timeout=3)
+
+        reponse = requests.post(
+            f"{self.url_serveur}/hello",
+            timeout=3
+        )
         reponse.raise_for_status()
+
         try:
-            return reponse.json()
+            data = reponse.json()
+            self.rid = data.get("rid")
+
         except Exception:
-            return reponse.text
-        
-    def nom_robot(self, rid, nom):
-        self._check_url()
-        reponse = requests.post(f"{self.url_serveur}/name",json={"rid": rid,"name": nom},timeout=3)
-        reponse.raise_for_status()
-        return reponse.json()
+            self.rid = reponse.text.strip()
+
+        return data
 
     def start(self):
         self._check_url()
@@ -57,7 +57,17 @@ class RequetesServeur:
         print("Réponse start :", reponse.status_code, reponse.text)
 
         reponse.raise_for_status()
-        return int(reponse.text)
+
+        try:
+            data = reponse.json()
+
+            if isinstance(data, dict):
+                steps = int(data.get('steps'))
+
+        except Exception as e:
+            return f"Erreur donnees invalides {e}"
+        
+        return steps
 
     def step(self, couleur, bras, expression):
         """
@@ -86,7 +96,16 @@ class RequetesServeur:
         )
         reponse.raise_for_status()
 
-        return int(reponse.text)
+        try:
+            data = reponse.json()
+
+            if isinstance(data, dict):
+                points = int(data.get('points'))
+
+        except Exception as e:
+            return f"Erreur donnees invalides {e}"
+
+        return points
 
     def score(self):
         """
@@ -108,7 +127,16 @@ class RequetesServeur:
         )
         reponse.raise_for_status()
 
-        return int(reponse.text)
+        try:
+            data = reponse.json()
+
+            if isinstance(data, dict):
+                points = int(data.get('points'))
+
+        except Exception as e:
+            return f"Erreur donnees invalides {e}"
+
+        return points
 
     def bye(self):
         """
@@ -131,24 +159,17 @@ class RequetesServeur:
 
         self.rid = None
 
-    def set_name(self):
-        """
-        Definir un nom pour le robot
-        """
+    def nom_robot(self, nom):
         self._check_url()
         self._check_rid()
 
-        donnees = {
-            "rid": self.rid,
-            "name": MARTY_NAME
-        }
-
         reponse = requests.post(
             f"{self.url_serveur}/name",
-            json=donnees,
+            json={"rid": self.rid, "name": nom},
             timeout=3
         )
         reponse.raise_for_status()
+        return reponse.json()
 
     @staticmethod
     def sonder_serveur(ip: str, timeout=1):
@@ -160,6 +181,15 @@ class RequetesServeur:
             return {"type": "serveur","nom": f"Serveur REST v{data.get('version', '?')}","ip": ip}
         except Exception:
             return None
+        
+    def deconnecter(self):
+        if not self.est_enregistre():
+            return
+
+        try:
+            self.bye()
+        except Exception:
+            pass
 
 
     def est_enregistre(self):
@@ -176,7 +206,7 @@ class RequetesServeur:
 if __name__ == "__main__":
     serveur = RequetesServeur()
 
-    serveur.definir_url()
+    serveur.definir_url("192.168.1.7")
 
     version = serveur.verifier_connexion()
     print("Version serveur :", version)
@@ -184,8 +214,9 @@ if __name__ == "__main__":
     rid = serveur.hello()
     print("Robot enregistré avec rid :", rid)
 
-    serveur.set_name()
-    print("Le robot s'appelle maintenant : ", MARTY_NAME)
+    robot = "GOATAGA"
+    serveur.nom_robot(robot)
+    print("Le robot s'appelle maintenant : ", robot)
 
     nb_pas = serveur.start()
     print("Nombre de pas :", nb_pas)

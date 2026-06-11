@@ -20,6 +20,7 @@ from PyQt6.QtWidgets import (
 #BACK-END IMPORTS#
 from approbot.calibrateur_couleurs import CalibrateurCouleurs
 from approbot.connexion_marty import ConnexionMarty
+from approbot.server_gets import RequetesServeur
 
 #FRONT-END IMPORTS#
 from ui.connexion import OngletConnexion
@@ -33,6 +34,7 @@ class MartySupreme(QWidget):
         super().__init__()
 
         self.connexion = ConnexionMarty()
+        self.serveur = RequetesServeur()
         self.calibration = CalibrateurCouleurs(self.connexion)
 
         self.setWindowTitle("Marty Supreme")
@@ -59,7 +61,7 @@ class MartySupreme(QWidget):
         )
 
         self.tabs.addTab(
-            OngletArbitre(self.connexion),
+            OngletArbitre(self.connexion, self.serveur),
             "Arbitre"
         )
 
@@ -68,7 +70,16 @@ class MartySupreme(QWidget):
         self.setLayout(layout)
 
     def closeEvent(self, event):
-        self.connexion.deconnecter()
+        try:
+            self.connexion.deconnecter()
+        except Exception:
+            pass
+
+        try:
+            self.serveur.deconnecter()
+        except Exception:
+            pass
+
         event.accept()
 
 

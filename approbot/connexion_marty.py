@@ -95,7 +95,6 @@ class ConnexionMarty:
     def rechercher_martys(self, reseau: str, debut: int = 1, fin: int = 254) -> list:
         resultats = []
         lock = threading.Lock()
-        print(reseau)
         def sonder(i):
             ip = f"{reseau}.{i}"
 

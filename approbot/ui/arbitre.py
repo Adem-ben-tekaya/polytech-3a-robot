@@ -1,15 +1,15 @@
-from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QListWidget, QListWidgetItem)
+from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QListWidget, QListWidgetItem, QApplication)
 from approbot.server_gets import RequetesServeur
 import threading
 
 
 class OngletArbitre(QWidget):
 
-    def __init__(self, connexion):
+    def __init__(self, connexion, serveur):
         super().__init__()
 
         self.connexion = connexion
-        self.requetes = RequetesServeur()
+        self.requetes = serveur
         self.rid = None
 
         layout = QVBoxLayout()
@@ -45,6 +45,11 @@ class OngletArbitre(QWidget):
         self.bouton_selection.clicked.connect(self.connecter_selection)
         layout.addWidget(self.bouton_selection)
 
+        self.boutton_deconnexion = QPushButton("Se déconnecter du serveur")
+        self.boutton_deconnexion.clicked.connect(self.deconnecter)
+        layout.addWidget(self.boutton_deconnexion)
+
+
         layout.addWidget(QLabel("Nom du robot"))
 
         self.input_nom_robot = QLineEdit()
@@ -62,7 +67,7 @@ class OngletArbitre(QWidget):
         if not ip:
             self.label_statut.setText("Erreur : IP invalide")
             return
-        self.connecter_a_ip(ip)
+        self.connecter(ip)
 
     def connecter_selection(self):
         item = self.liste_serveurs.currentItem()
@@ -70,18 +75,25 @@ class OngletArbitre(QWidget):
             self.label_statut.setText("Erreur : sélectionnez un serveur.")
             return
         ip = item.data(1000)
-        self.connecter_a_ip(ip)
+        self.connecter(ip)
 
-    def connecter_a_ip(self, ip):
+    def connecter(self, ip):
         try:
             self.requetes.url_serveur = f"http://{ip}:8080"
             version = self.requetes.verifier_connexion()
             reponse = self.requetes.hello()
             self.rid = reponse["rid"]
-            self.label_statut.setText(f"Connecté au serveur {ip} ({version})")
+            self.label_statut.setText(f"Connecté au serveur {ip} V{version[-6:-3]}")
 
         except Exception as e:
             self.label_statut.setText(f"Erreur connexion : {e}")
+
+    def deconnecter(self):
+        try:
+            self.requetes.bye()
+            self.label_statut.setText(f"Déconnecté")
+        except Exception as e:
+            self.label_statut.setText(f"La déconnexion n'a pas été effectuée : {e}")
 
     def rechercher_serveurs(self):
         reseau = self.input_reseau.text().strip()
@@ -89,7 +101,8 @@ class OngletArbitre(QWidget):
             self.label_statut.setText("Erreur : réseau invalide.")
             return
         self.liste_serveurs.clear()
-        self.label_statut.setText(f"Recherche sur {reseau}....")
+        self.label_statut.setText(f"Recherche dans {reseau}.X/24 en cours.")
+        QApplication.processEvents()
         serveurs = []
         lock = threading.Lock()
 
@@ -126,11 +139,9 @@ class OngletArbitre(QWidget):
         if not nom:
             self.label_statut.setText("Nom invalide")
             return
-        if self.rid is None:
-            self.label_statut.setText("Connectez-vous au serveur d'abord")
-            return
         try:
-            self.requetes.nom_robot(self.rid, nom)
+            self.requetes._check_rid()
+            self.requetes.nom_robot(nom)
             self.label_statut.setText(f"Nom '{nom}' enregistré")
         except Exception as e:
             self.label_statut.setText(f"Erreur : {e}")
