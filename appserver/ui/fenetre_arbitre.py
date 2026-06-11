@@ -197,45 +197,56 @@ class FenetrePrincipale(QMainWindow):
         signals.serveur_arrete.connect(self.serveur_arrete)
 
 
-    def executer_commande_admin(self, commande: str) -> bool:
+    def lancer_firewall_helper(self, action: str, port: int) -> bool:
         """
-        Lance une commande Windows avec élévation UAC.
+        Lance Marty Supreme Firewall.exe en administrateur.
 
-        Retourne True si Windows accepte de lancer la commande,
-        False si l'utilisateur annule ou si l'appel échoue.
+        action : "add" ou "delete"
+        port   : port du serveur Flask, ex 8080
         """
+        racine_projet = os.path.dirname(
+            os.path.dirname(
+                os.path.dirname(os.path.abspath(__file__))
+            )
+        )
+
+        chemin_helper = os.path.join(
+            racine_projet,
+            "dist",
+            "Marty Supreme Firewall.exe"
+        )
+
+        if not os.path.exists(chemin_helper):
+            self._log(f"Helper pare-feu introuvable : {chemin_helper}", "#e74c3c")
+            print("To compile helper you must run :")
+            print(r'.\.venv\Scripts\pyinstaller.exe --onefile --windowed --uac-admin --icon="appserver\ui\assets\logo.ico" --name "AppServer-Firewall" firewall_helper.py')
+            return False
+
         resultat = ctypes.windll.shell32.ShellExecuteW(
             None,
             "runas",
-            "cmd.exe",
-            f"/c {commande}",
+            chemin_helper,
+            f"{action} {port}",
             None,
-            1
+            0
         )
 
         return resultat > 32
 
     def demarrer_serveur(self):
-        self.port_actuel = int(self.spin_port.text())   # On sauvegarde le port avant de désactiver le champ
-        nom_regle = f'Marty Supreme Server {self.port_actuel}'
-        commande = (
-                f'netsh advfirewall firewall add rule '
-                f'name="{nom_regle}" '
-                f'dir=in '
-                f'action=allow '
-                f'protocol=TCP '
-                f'localport={self.port_actuel} '
-                f'profile=private '
-                f'remoteip=localsubnet'
-            )
-
-        ok = self.executer_commande_admin(commande)
-
-        if not ok:
-            self._log("Autorisation pare-feu annulée ou refusée.", "#e74c3c")
+        try:
+            self.port_actuel = int(self.spin_port.text())
+        except ValueError:
+            self._log("Port invalide.", "#e74c3c")
             return
 
-        self._log("Demande d'autorisation pare-feu envoyée.", "#2ecc71")
+        ok = self.lancer_firewall_helper("add", self.port_actuel)
+
+        if not ok:
+            self._log("Autorisation pare-feu refusée ou impossible.", "#e74c3c")
+            return
+
+        self._log("Règle pare-feu temporaire ajoutée.", "#2ecc71")
 
         self.flask_thread = FlaskThread(self.port_actuel)
         self.flask_thread.start()
@@ -250,19 +261,12 @@ class FenetrePrincipale(QMainWindow):
             self.flask_thread.wait(3000)
             self.flask_thread = None
 
-        nom_regle = f"Marty Supreme Server {self.port_actuel}"
-
-        commande = (
-            f'netsh advfirewall firewall delete rule '
-            f'name="{nom_regle}"'
-        )
-
-        ok = self.executer_commande_admin(commande)
+        ok = self.lancer_firewall_helper("delete", self.port_actuel)
 
         if ok:
-            self._log("Demande de suppression de la règle pare-feu envoyée.", "#2ecc71")
+            self._log("Règle pare-feu supprimée", "#2ecc71")
         else:
-            self._log("Suppression pare-feu annulée ou refusée.", "#e74c3c")
+            self._log("Suppression pare-feu refusée ou impossible.", "#e74c3c")
 
         self.btn_start.setEnabled(True)
         self.btn_stop.setEnabled(False)
