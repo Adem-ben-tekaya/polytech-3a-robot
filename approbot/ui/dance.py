@@ -1,4 +1,7 @@
 from PyQt6.QtWidgets import (
+    QGridLayout,
+    QLineEdit,
+    QSpinBox,
     QWidget,
     QVBoxLayout,
     QHBoxLayout,
@@ -10,7 +13,7 @@ from PyQt6.QtWidgets import (
     QScrollArea,
     QSizePolicy
 )
-from PyQt6.QtCore import QThread
+from PyQt6.QtCore import QThread, Qt
 from approbot.mouvement_marty import MouvementMarty
 from approbot.dance_parser import parse as parse_dance, resume as resume_dance
 from approbot.choreo_worker import ChoreoWorker
@@ -27,8 +30,43 @@ class OngletDance(QWidget):
         self._worker = None
         self._thread = None
 
-        layout = QVBoxLayout()
-        layout.setSpacing(10)
+        layout_principal = QVBoxLayout()
+        layout_principal.setSpacing(10)
+
+        # ── Multiplicateurs ──────────────────────────────────────────────
+        groupe_multiplicateurs = QGroupBox("Multiplicateurs de déplacement")
+        layout_multiplicateurs = QGridLayout()
+
+        directions = {
+            "U": "Avant",
+            "B": "Arrière",
+            "L": "Gauche",
+            "R": "Droite"
+        }
+
+        self.champs_multiplicateurs = {}
+
+        for colonne, (code, texte) in enumerate(directions.items()):
+            label = QLabel(texte)
+            label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+            champ = QSpinBox()
+            champ.setMinimum(0)
+            champ.setMaximum(999)
+            if colonne in [2,3]:
+                champ.setValue(4)
+            else :
+                champ.setValue(2)
+            champ.valueChanged.connect(self._actualiser_apercu)
+
+            layout_multiplicateurs.addWidget(label, 0, colonne)
+            layout_multiplicateurs.addWidget(champ, 1, colonne)
+
+            self.champs_multiplicateurs[code] = champ
+
+        groupe_multiplicateurs.setLayout(layout_multiplicateurs)
+        layout_principal.addWidget(groupe_multiplicateurs)
+
 
         # ── Fichier ──────────────────────────────────────────────────────
         groupe_fichier = QGroupBox("Fichier .dance")
@@ -43,7 +81,7 @@ class OngletDance(QWidget):
         layout_fichier.addWidget(self.label_fichier)
         layout_fichier.addWidget(bouton_charger)
         groupe_fichier.setLayout(layout_fichier)
-        layout.addWidget(groupe_fichier)
+        layout_principal.addWidget(groupe_fichier)
 
         # ── Aperçu de la chorégraphie ─────────────────────────────────────
         groupe_apercu = QGroupBox("Chorégraphie chargée")
@@ -52,11 +90,10 @@ class OngletDance(QWidget):
         self.texte_apercu = QTextEdit()
         self.texte_apercu.setReadOnly(True)
         self.texte_apercu.setPlaceholderText("Le contenu du fichier .dance apparaîtra ici après chargement.")
-        self.texte_apercu.setMaximumHeight(160)
         layout_apercu.addWidget(self.texte_apercu)
 
         groupe_apercu.setLayout(layout_apercu)
-        layout.addWidget(groupe_apercu)
+        layout_principal.addWidget(groupe_apercu)
 
         # ── Contrôle ─────────────────────────────────────────────────────
         groupe_controle = QGroupBox("Contrôle")
@@ -79,7 +116,7 @@ class OngletDance(QWidget):
         layout_controle.addWidget(self.label_statut)
 
         groupe_controle.setLayout(layout_controle)
-        layout.addWidget(groupe_controle)
+        layout_principal.addWidget(groupe_controle)
 
         # ── Résultats ─────────────────────────────────────────────────────
         groupe_resultats = QGroupBox("Résultats d'exécution")
@@ -96,9 +133,9 @@ class OngletDance(QWidget):
         layout_resultats.addWidget(bouton_effacer)
 
         groupe_resultats.setLayout(layout_resultats)
-        layout.addWidget(groupe_resultats)
+        layout_principal.addWidget(groupe_resultats)
 
-        self.setLayout(layout)
+        self.setLayout(layout_principal)
 
     # ── Slots ─────────────────────────────────────────────────────────────
 
@@ -112,20 +149,86 @@ class OngletDance(QWidget):
             self._dance = parse_dance(path)
             nom = path.replace('\\', '/').split('/')[-1]
             self.label_fichier.setText(nom)
-            self.texte_apercu.setPlainText(resume_dance(self._dance))
+            self._actualiser_apercu()
             self.bouton_lancer.setEnabled(True)
             self.label_statut.setText(f"Fichier chargé : {nom}")
         except Exception as e:
             self.label_statut.setText(f"Erreur lecture .dance : {e}")
 
+    def _multiplicateurs(self):
+        return {
+            "U": self.champs_multiplicateurs["U"].value(),
+            "B": self.champs_multiplicateurs["B"].value(),
+            "L": self.champs_multiplicateurs["L"].value(),
+            "R": self.champs_multiplicateurs["R"].value(),
+        }
+    
+    def _actualiser_apercu(self):
+        if self._dance is None:
+            return
+
+        multiplicateurs = self._multiplicateurs()
+
+        noms = {
+            "U": "Avant",
+            "B": "Arrière",
+            "L": "Gauche",
+            "R": "Droite"
+        }
+
+        lignes = []
+
+        lignes.append("Mouvements avec multiplicateurs :")
+        lignes.append("")
+
+        for index, move in enumerate(self._dance["moves"], start=1):
+            direction = move["direction"]
+            count_base = move["count"]
+
+            multiplicateur = multiplicateurs.get(direction, 1)
+            count_final = count_base * multiplicateur
+
+            nom_direction = noms.get(direction, direction)
+
+            lignes.append(
+                f"{index}. {count_base}x {nom_direction} "
+                f"× {multiplicateur} = {count_final} mouvement(s)"
+            )
+
+        lignes.append("")
+        lignes.append("Actions par couleur :")
+        lignes.append("")
+
+        actions = self._dance.get("actions", {})
+
+        if not actions:
+            lignes.append("Aucune action définie.")
+        else:
+            for couleur, action in actions.items():
+                arms = action.get("arms", [])
+                expression = action.get("expression", "XNT")
+
+                bras = "+".join(arms) if arms else "aucun"
+
+                lignes.append(
+                    f"{couleur} → bras: {bras}, expression: {expression}"
+                )
+
+        self.texte_apercu.setPlainText("\n".join(lignes))
+
     def _lancer(self):
         if not self.connexion.is_connected():
             self.label_statut.setText("Statut : robot non connecté")
             return
+
         if self._dance is None:
             return
 
+        multiplicateurs = self._multiplicateurs()
+
         nb_steps = len(self._dance['moves'])
+
+        self.log_execution.clear()
 
         if self.serveur is not None and self.serveur.est_enregistre():
             try:
@@ -135,11 +238,24 @@ class OngletDance(QWidget):
                 self.label_statut.setText(f"Erreur serveur start : {e}")
                 return
 
-        self.log_execution.clear()
         self.log_execution.append(f"Démarrage — {nb_steps} pas\n")
 
+        self.log_execution.append(
+            f"Multiplicateurs : avant x{multiplicateurs['U']}, "
+            f"arrière x{multiplicateurs['B']}, "
+            f"gauche x{multiplicateurs['L']}, "
+            f"droite x{multiplicateurs['R']}\n"
+        )
+
         self._thread = QThread()
-        self._worker = ChoreoWorker(self.mouvement, self._dance, nb_steps, serveur=self.serveur)
+
+        self._worker = ChoreoWorker(
+            self.mouvement,
+            self._dance,
+            nb_steps,
+            multipliers=multiplicateurs,
+            serveur=self.serveur
+        )
         self._worker.moveToThread(self._thread)
 
         self._thread.started.connect(self._worker.run)

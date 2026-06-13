@@ -17,7 +17,7 @@ class ChoreoWorker(QObject):
     finished = pyqtSignal()
     error = pyqtSignal(str)
 
-    def __init__(self, mouvement, dance_or_dance_file_path, nb_steps: int, serveur=None, offline: bool = False):
+    def __init__(self, mouvement, dance_or_dance_file_path, nb_steps: int, multipliers: dict | None = None, serveur=None, offline: bool = False):
         super().__init__()
 
         self._mouvement = mouvement
@@ -26,6 +26,10 @@ class ChoreoWorker(QObject):
         self._offline = offline
         self._stop = False
 
+        if multipliers is None:
+            multipliers = {"U": 2, "B": 2, "L": 4, "R": 4}
+        self._mults = multipliers
+        print(f'Multiplicateurs : {multipliers}')
         if dance_or_dance_file_path is None:
             raise ValueError("Chargez un fichier .dance avant de lancer une danse.")
 
@@ -56,7 +60,9 @@ class ChoreoWorker(QObject):
 
                 move = moves[step % nb_moves]
                 direction = move['direction']
-                count = move['count']
+                count_base = move['count']
+                multiplicateur = self._mults.get(direction, 1)
+                count = count_base * multiplicateur
                 noms = {
                     'U': 'avant', 
                     'B': 'arrière', 
@@ -65,7 +71,14 @@ class ChoreoWorker(QObject):
                     }
                 
                 self.log.emit(
-                    f"Pas {step + 1}/{self._nb_steps} : {count}x {noms.get(direction, direction)}"
+                    f"Pas {step + 1}/{self._nb_steps} : "
+                    f"{count_base}x {noms.get(direction, direction)} "
+                    f"(multiplicateur x{multiplicateur} → {count} mouvement(s))"
+                )
+                print(
+                    f"Pas {step + 1}/{self._nb_steps} : "
+                    f"{count_base}x {noms.get(direction, direction)} "
+                    f"(multiplicateur x{multiplicateur} → {count} mouvement(s))"
                 )
 
                 if not self._offline:
