@@ -168,7 +168,7 @@ class OngletJoueur(QWidget):
             self.label_statut.setText("Statut : robot non connecté")
             return
         try:
-            couleur = self.mouvement.get_couleur("left")
+            couleur = self.mouvement.get_couleur()
             self.label_statut.setText(f"Couleur capteur : {couleur}")
         except Exception as e:
             self.label_statut.setText(f"Erreur capteur couleur : {e}")

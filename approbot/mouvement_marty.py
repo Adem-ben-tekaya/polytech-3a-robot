@@ -131,6 +131,17 @@ class MouvementMarty:
                 self.set_bras("ARB", "ALU")
             marty.disco_off(api='led')
 
+    def reset_position(self) -> None:
+        """Remet les bras et les yeux en position neutre."""
+        if not self._connexion.is_connected():
+            return
+        marty = self._connexion.marty
+        marty.set_blocking(False)
+        marty.move_joint(JOINT_LEFT_ARM, 0, STEP_TIME_MS)
+        marty.move_joint(JOINT_RIGHT_ARM, 0, STEP_TIME_MS)
+        marty.disco_off(api='led')
+        marty.eyes("normal", move_time=300)
+
     # ------------------------------------------------------------------
     # Capteurs
     # ------------------------------------------------------------------
@@ -145,8 +156,8 @@ class MouvementMarty:
         b = marty.get_color_sensor_value_by_channel(2)
         return (r, g, b)
     
-    def get_couleur(self, pied="left"):
-        return self._calibrateur.get_couleur(pied)
+    def get_couleur(self):
+        return self._calibrateur.get_couleur()
     
     def get_batterie(self) -> float:
         """Retourne le pourcentage de batterie restant, ou -1 si déconnecté."""

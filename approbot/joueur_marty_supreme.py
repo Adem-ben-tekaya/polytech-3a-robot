@@ -27,6 +27,7 @@ from ui.connexion import OngletConnexion
 from ui.calibration import OngletCalibration
 from ui.joueur import OngletJoueur
 from ui.arbitre import OngletArbitre
+from ui.dance import OngletDance
 from ui.style import STYLE
 
 
@@ -37,6 +38,7 @@ class MartySupreme(QWidget):
         self.connexion = ConnexionMarty()
         self.serveur = ServerGets()
         self.calibration = CalibrateurCouleurs(self.connexion)
+        self.onglet_dance = OngletDance(self.connexion, self.calibration, self.serveur)
 
         self.setWindowTitle("Marty Supreme")
         self.setWindowIcon(QIcon(chemin_icone))
@@ -52,7 +54,7 @@ class MartySupreme(QWidget):
         )
 
         self.tabs.addTab(
-            OngletCalibration(self.connexion),
+            OngletCalibration(self.connexion, self.calibration),
             "Calibration"
         )
 
@@ -60,6 +62,8 @@ class MartySupreme(QWidget):
             OngletJoueur(self.connexion, self.calibration, self.serveur),
             "Joueur"
         )
+
+        self.tabs.addTab(self.onglet_dance, "Chorégraphie")
 
         self.tabs.addTab(
             OngletArbitre(self.connexion, self.serveur),
@@ -71,21 +75,20 @@ class MartySupreme(QWidget):
         self.setLayout(layout)
 
     def closeEvent(self, event):
-        print("Fermeture de l'app")
-        print("Serveur URL :", self.serveur.url_serveur)
-        print("Serveur RID :", self.serveur.rid)
+        try:
+            self.onglet_dance.cleanup()
+        except Exception:
+            pass
 
         try:
             self.connexion.deconnecter()
-            print("Marty déconnecté")
-        except Exception as e:
-            print("Erreur déconnexion Marty :", e)
+        except Exception:
+            pass
 
         try:
             self.serveur.deconnecter()
-            print("Serveur déconnecté")
-        except Exception as e:
-            print("Erreur déconnexion serveur :", e)
+        except Exception:
+            pass
 
         event.accept()
 

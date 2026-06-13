@@ -1,6 +1,6 @@
 import time
 from PyQt6.QtCore import QObject, pyqtSignal
-from dance_parser import parse
+from approbot.dance_parser import parse
 
 class ChoreoWorker(QObject):
     """Exécute une chorégraphie pas à pas dans un QThread.
@@ -71,7 +71,7 @@ class ChoreoWorker(QObject):
                 if not self._offline:
                     self._mouvement.marcher(direction, count)
 
-                    couleur_lue = self._mouvement.get_couleur("left")
+                    couleur_lue = self._mouvement.get_couleur()
                     couleur = self.normaliser_couleur(couleur_lue)
                     self.log.emit(f"  Couleur détectée : {couleur_lue} -> code {couleur}")
 
@@ -120,6 +120,7 @@ class ChoreoWorker(QObject):
 
         except Exception as e:
             self.error.emit(str(e))
+            self.finished.emit()
 
     @staticmethod
     def normaliser_couleur(couleur):
