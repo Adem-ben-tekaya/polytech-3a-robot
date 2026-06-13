@@ -33,7 +33,7 @@ def supprimer_regle(port):
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print("Usage : firewall_helper.exe add|delete PORT")
+        print("Usage : dist/firewall_helper.exe add|delete PORT")
         sys.exit(1)
 
     action = sys.argv[1]

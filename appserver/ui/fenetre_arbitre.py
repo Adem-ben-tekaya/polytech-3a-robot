@@ -213,13 +213,13 @@ class FenetrePrincipale(QMainWindow):
         chemin_helper = os.path.join(
             racine_projet,
             "dist",
-            "Marty Supreme Firewall.exe"
+            "AppServer-Firewall.exe"
         )
 
         if not os.path.exists(chemin_helper):
             self._log(f"Helper pare-feu introuvable : {chemin_helper}", "#e74c3c")
             print("To compile helper you must run :")
-            print(r'.\.venv\Scripts\pyinstaller.exe --onefile --windowed --uac-admin --icon="appserver\ui\assets\logo.ico" --name "AppServer-Firewall" firewall_helper.py')
+            print(r'.\.venv\Scripts\python.exe -m PyInstaller --onefile --windowed --uac-admin --icon="appserver\ui\assets\logo.ico" --name "AppServer-Firewall" firewall_helper.py')
             return False
 
         resultat = ctypes.windll.shell32.ShellExecuteW(
