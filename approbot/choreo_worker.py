@@ -307,6 +307,7 @@ def lancer_battle_console(ip_marty, ip_serveur, fichier_dance, nom_robot="Marty"
             mouvement=mouvement,
             dance_or_dance_file_path=dance,
             nb_steps=nb_steps,
+            multipliers= {"U": 2, "B": 2, "L": 4, "R": 4},
             serveur=serveur,
             offline=offline
         )
