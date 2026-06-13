@@ -16,39 +16,45 @@ class CalibrateurCouleurs:
         self.charger_calibration()
 
 
-    def lire_valeur_brute(self, pied="left"):
+    def _nom_capteur_couleur(self) -> str:
+        """Découvre le nom réel de l'add-on capteur couleur déclaré par le robot."""
+        addons = self.connexion.marty.get_add_ons_status()
+        for addon in addons.values():
+            if isinstance(addon, dict) and addon.get('whoAmI', '').lower() == 'coloursensor':
+                return addon['name']
+        raise RuntimeError(
+            "Aucun capteur couleur trouvé. "
+            "Vérifiez que le capteur est branché et reconnu par le robot."
+        )
+
+    def lire_valeur_brute(self):
         """
-        Lit la valeur la plus exploitable du capteur couleur Marty.
-
-        Pour notre projet, on utilise la valeur HEX car elle représente déjà
-        une couleur complète sous forme RRGGBB.
-
-        Exemple retourné :
-        "871819"
+        Lit la valeur HEX du capteur couleur Marty.
+        Retourne une chaîne "rrggbb".
         """
         if self.connexion is None:
             raise RuntimeError("Impossible de lire Marty : aucune connexion fournie")
-        
+
         if not self.connexion.is_connected():
             raise RuntimeError("Marty n'est pas connecté")
 
-        valeur_hex = self.connexion.marty.get_color_sensor_hex(pied)
+        nom = self._nom_capteur_couleur()
+        valeur_hex = self.connexion.marty.get_color_sensor_hex(nom)
 
         return self.nettoyer_hex(valeur_hex)
 
 
-    def ajouter_mesure(self, couleur_reelle, eclairage, valeur_brute=None, pied="left"):
+    def ajouter_mesure(self, couleur_reelle, eclairage, valeur_brute=None):
         """
-        Ajoute une mesure dans la calibration.
+        Enregistre une mesure de calibration et la sauvegarde dans le JSON.
 
-        couleur_reelle : ex "Rouge", "Bleu", "Vert"
-        eclairage : "Lumineux", "Normal", "Sombre"
-        valeur_brute : optionnel, utile pour tester sans robot
-        pied : "left" ou "right"
+        couleur_reelle : ex "Rouge", "Bleu", "Noir"
+        eclairage      : ex "Normal", "Très lumineux"
+        valeur_brute   : optionnel — hex brut, utile pour tester sans robot
         """
 
         if valeur_brute is None:
-            valeur_brute = self.lire_valeur_brute(pied)
+            valeur_brute = self.lire_valeur_brute()
 
         valeur_brute = self.nettoyer_hex(valeur_brute)
 
@@ -66,28 +72,29 @@ class CalibrateurCouleurs:
         return mesure
 
 
-    def get_couleur(self, pied="left", seuil_max=80):
+    def get_couleur(self, seuil_max=80):
         """
-        Lit le capteur et renvoie le nom de la couleur la plus proche.
+        Lit le capteur et renvoie le nom de la couleur la plus proche (str).
 
-        Exemple :
-        capteur -> "FF6534"
-        retour  -> "Rouge"
+        Retourne "inconnue" si aucune calibration ou si la distance dépasse seuil_max.
         """
-        valeur_brute = self.lire_valeur_brute(pied)
-        return self.trouver_couleur_depuis_hex(valeur_brute, seuil_max)
+        valeur_brute = self.lire_valeur_brute()
+        nom, _ = self.trouver_couleur_depuis_hex(valeur_brute, seuil_max)
+        return nom
+
 
     def trouver_couleur_depuis_hex(self, valeur_hex=None, seuil_max=80):
         """
         Trouve la couleur calibrée la plus proche d'une valeur HEX.
+        Retourne toujours un tuple (nom: str, distance: float).
 
-        Cette fonction est très utile pour débugger sans robot :
-        calibrateur.trouver_couleur_depuis_hex("871819")
+        Exemple :
+            calibrateur.trouver_couleur_depuis_hex("871819")  ->  ("Rouge", 12.4)
         """
         if not self.mesures:
-            return "inconnue/aucun fichier de calibration n'a été trouvé"
-        
-        if valeur_hex == None:
+            return "inconnue", 0.0
+
+        if valeur_hex is None:
             valeur_hex = self.lire_valeur_brute()
 
         valeur_hex = self.nettoyer_hex(valeur_hex)
@@ -108,23 +115,14 @@ class CalibrateurCouleurs:
             return "inconnue", round(meilleure_distance, 2)
 
         return meilleure_couleur, round(meilleure_distance, 2)
-    
+
+
     # Gestion du fichier de calibration
     def sauvegarder_calibration(self):
-        """
-        Écrit dans le fichier de calibrations les mesures 
-        enregistrer durant la session de calibration
-        """
         with open(self.nom_fichier, "w", encoding="utf-8") as fichier:
             json.dump(self.mesures, fichier, indent=4, ensure_ascii=False)
 
     def charger_calibration(self):
-        """
-        Créer une liste dans laquelle se trouvera l'intégralité des mesures 
-        enregistrer durant la session de calibration
-
-        Renvoi une liste vide si aucune calibration n'a été trouvée
-        """
         if not os.path.exists(self.nom_fichier):
             self.mesures = []
             return
@@ -140,16 +138,7 @@ class CalibrateurCouleurs:
     @staticmethod
     def nettoyer_hex(valeur_hex):
         """
-        Nettoie une valeur HEX.
-
-        Accepte :
-        "#FF6534"
-        "FF6534"
-        "0xff6534"
-        "aFf6534"
-
-        Retourne toujours :
-        "ff6534"
+        Normalise une valeur HEX vers "rrggbb" (6 chiffres, minuscules, sans préfixe).
         """
         valeur_hex = str(valeur_hex).strip().lower()
         valeur_hex = valeur_hex.replace("#", "")
@@ -167,11 +156,9 @@ class CalibrateurCouleurs:
 
     @staticmethod
     def hex_vers_rgb(clean_valeur_hex):
-
         r = int(clean_valeur_hex[0:2], 16)
         g = int(clean_valeur_hex[2:4], 16)
         b = int(clean_valeur_hex[4:6], 16)
-
         return [r, g, b]
 
     @staticmethod
@@ -181,37 +168,33 @@ class CalibrateurCouleurs:
             (rgb1[1] - rgb2[1]) ** 2 +
             (rgb1[2] - rgb2[2]) ** 2
         )
-    
+
     def generer_hex(self):
-        """
-        Outil de debug et de test qui 
-        génère une couleur aléatoire
-        """
+        """Génère une couleur aléatoire (outil de debug)."""
         return "#{:06x}".format(randint(0, 0xFFFFFF))
-    
+
+
 if __name__ == "__main__":
     calibrateur = CalibrateurCouleurs(connexion=None)
-    for color,hex_color in [
-        ("Rouge","#ff0000"),
-        ("Vert","#00ff00"),
-        ("Bleu","#0000ff"),
-        ("Jaune","#ffff00"),
-        ("Magenta","#ff00ff"),
-        ("Cyan","#00ffff"),
-        ("Blanc","#ffffff"),
-        ("Noir","#000000")
-        ]:
-
+    for color, hex_color in [
+        ("Rouge",   "#ff0000"),
+        ("Vert",    "#00ff00"),
+        ("Bleu",    "#0000ff"),
+        ("Jaune",   "#ffff00"),
+        ("Magenta", "#ff00ff"),
+        ("Cyan",    "#00ffff"),
+        ("Blanc",   "#ffffff"),
+        ("Noir",    "#000000"),
+    ]:
         mesure = calibrateur.ajouter_mesure(
             couleur_reelle=color,
             eclairage="Lumineux",
-            valeur_brute= hex_color
+            valeur_brute=hex_color
         )
         print(mesure)
 
     while True:
         random_hex = calibrateur.generer_hex()
-        results = calibrateur.trouver_couleur_depuis_hex(random_hex, 80)
-        # guess, distance = 
-        print(f"For {random_hex} the guess is {results[0]} avec une distance de {results[1]}")
+        nom, distance = calibrateur.trouver_couleur_depuis_hex(random_hex, 80)
+        print(f"For {random_hex} the guess is {nom} avec une distance de {distance}")
         time.sleep(0.1)

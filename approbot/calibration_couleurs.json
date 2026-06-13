@@ -1,992 +1,123 @@
 [
     {
-        "couleur": "Rouge",
-        "eclairage": "Lumineux",
-        "hex": "ff0000",
+        "couleur": "bleu",
+        "eclairage": "Normal",
+        "hex": "483942",
         "rgb": [
-            255,
-            0,
-            0
+            72,
+            57,
+            66
         ],
-        "date": "2026-06-10T23:53:12"
+        "date": "2026-06-12T16:56:02"
     },
     {
-        "couleur": "Vert",
-        "eclairage": "Lumineux",
-        "hex": "00ff00",
+        "couleur": "violet",
+        "eclairage": "Normal",
+        "hex": "2f181a",
         "rgb": [
-            0,
-            255,
-            0
+            47,
+            24,
+            26
         ],
-        "date": "2026-06-10T23:53:12"
+        "date": "2026-06-12T17:15:56"
     },
     {
-        "couleur": "Bleu",
-        "eclairage": "Lumineux",
-        "hex": "0000ff",
+        "couleur": "vert",
+        "eclairage": "Normal",
+        "hex": "312116",
         "rgb": [
-            0,
-            0,
-            255
+            49,
+            33,
+            22
         ],
-        "date": "2026-06-10T23:53:12"
+        "date": "2026-06-12T17:17:44"
     },
     {
-        "couleur": "Jaune",
-        "eclairage": "Lumineux",
-        "hex": "ffff00",
+        "couleur": "bleu",
+        "eclairage": "Normal",
+        "hex": "403139",
         "rgb": [
-            255,
-            255,
-            0
+            64,
+            49,
+            57
         ],
-        "date": "2026-06-10T23:53:12"
+        "date": "2026-06-12T17:17:56"
     },
     {
-        "couleur": "Magenta",
-        "eclairage": "Lumineux",
-        "hex": "ff00ff",
+        "couleur": "jaune",
+        "eclairage": "Normal",
+        "hex": "c65934",
         "rgb": [
-            255,
-            0,
-            255
+            198,
+            89,
+            52
         ],
-        "date": "2026-06-10T23:53:12"
+        "date": "2026-06-12T17:18:07"
     },
     {
-        "couleur": "Cyan",
-        "eclairage": "Lumineux",
-        "hex": "00ffff",
+        "couleur": "rouge",
+        "eclairage": "Normal",
+        "hex": "6c1515",
         "rgb": [
-            0,
-            255,
-            255
+            108,
+            21,
+            21
         ],
-        "date": "2026-06-10T23:53:12"
+        "date": "2026-06-12T17:18:18"
     },
     {
-        "couleur": "Blanc",
-        "eclairage": "Lumineux",
-        "hex": "ffffff",
-        "rgb": [
-            255,
-            255,
-            255
-        ],
-        "date": "2026-06-10T23:53:12"
-    },
-    {
-        "couleur": "Noir",
-        "eclairage": "Lumineux",
-        "hex": "000000",
-        "rgb": [
-            0,
-            0,
-            0
-        ],
-        "date": "2026-06-10T23:53:12"
-    },
-    {
-        "couleur": "Rouge",
-        "eclairage": "Lumineux",
-        "hex": "ff0000",
-        "rgb": [
-            255,
-            0,
-            0
-        ],
-        "date": "2026-06-10T23:53:30"
-    },
-    {
-        "couleur": "Vert",
-        "eclairage": "Lumineux",
-        "hex": "00ff00",
-        "rgb": [
-            0,
-            255,
-            0
-        ],
-        "date": "2026-06-10T23:53:30"
-    },
-    {
-        "couleur": "Bleu",
-        "eclairage": "Lumineux",
-        "hex": "0000ff",
-        "rgb": [
-            0,
-            0,
-            255
-        ],
-        "date": "2026-06-10T23:53:30"
-    },
-    {
-        "couleur": "Jaune",
-        "eclairage": "Lumineux",
-        "hex": "ffff00",
-        "rgb": [
-            255,
-            255,
-            0
-        ],
-        "date": "2026-06-10T23:53:30"
-    },
-    {
-        "couleur": "Magenta",
-        "eclairage": "Lumineux",
-        "hex": "ff00ff",
-        "rgb": [
-            255,
-            0,
-            255
-        ],
-        "date": "2026-06-10T23:53:30"
-    },
-    {
-        "couleur": "Cyan",
-        "eclairage": "Lumineux",
-        "hex": "00ffff",
-        "rgb": [
-            0,
-            255,
-            255
-        ],
-        "date": "2026-06-10T23:53:30"
-    },
-    {
-        "couleur": "Blanc",
-        "eclairage": "Lumineux",
-        "hex": "ffffff",
-        "rgb": [
-            255,
-            255,
-            255
-        ],
-        "date": "2026-06-10T23:53:30"
-    },
-    {
-        "couleur": "Noir",
-        "eclairage": "Lumineux",
-        "hex": "000000",
-        "rgb": [
-            0,
-            0,
-            0
-        ],
-        "date": "2026-06-10T23:53:30"
-    },
-    {
-        "couleur": "Rouge",
-        "eclairage": "Lumineux",
-        "hex": "ff0000",
-        "rgb": [
-            255,
-            0,
-            0
-        ],
-        "date": "2026-06-11T00:16:42"
-    },
-    {
-        "couleur": "Vert",
-        "eclairage": "Lumineux",
-        "hex": "00ff00",
-        "rgb": [
-            0,
-            255,
-            0
-        ],
-        "date": "2026-06-11T00:16:42"
-    },
-    {
-        "couleur": "Bleu",
-        "eclairage": "Lumineux",
-        "hex": "0000ff",
-        "rgb": [
-            0,
-            0,
-            255
-        ],
-        "date": "2026-06-11T00:16:42"
-    },
-    {
-        "couleur": "Jaune",
-        "eclairage": "Lumineux",
-        "hex": "ffff00",
-        "rgb": [
-            255,
-            255,
-            0
-        ],
-        "date": "2026-06-11T00:16:42"
-    },
-    {
-        "couleur": "Magenta",
-        "eclairage": "Lumineux",
-        "hex": "ff00ff",
-        "rgb": [
-            255,
-            0,
-            255
-        ],
-        "date": "2026-06-11T00:16:42"
-    },
-    {
-        "couleur": "Cyan",
-        "eclairage": "Lumineux",
-        "hex": "00ffff",
-        "rgb": [
-            0,
-            255,
-            255
-        ],
-        "date": "2026-06-11T00:16:42"
-    },
-    {
-        "couleur": "Blanc",
-        "eclairage": "Lumineux",
-        "hex": "ffffff",
-        "rgb": [
-            255,
-            255,
-            255
-        ],
-        "date": "2026-06-11T00:16:42"
-    },
-    {
-        "couleur": "Noir",
-        "eclairage": "Lumineux",
-        "hex": "000000",
-        "rgb": [
-            0,
-            0,
-            0
-        ],
-        "date": "2026-06-11T00:16:42"
-    },
-    {
-        "couleur": "Vert",
+        "couleur": "jaune",
         "eclairage": "Très lumineux",
-        "hex": "348e2d",
+        "hex": "bf5633",
         "rgb": [
-            52,
-            142,
-            45
+            191,
+            86,
+            51
         ],
-        "date": "2026-06-11T00:21:51"
+        "date": "2026-06-12T17:25:27"
     },
     {
-        "couleur": "Rouge",
+        "couleur": "vert",
         "eclairage": "Très lumineux",
-        "hex": "348e2d",
+        "hex": "312115",
         "rgb": [
-            52,
-            142,
-            45
+            49,
+            33,
+            21
         ],
-        "date": "2026-06-11T00:24:44"
+        "date": "2026-06-12T17:25:44"
     },
     {
-        "couleur": "Rouge",
-        "eclairage": "Lumineux",
-        "hex": "ff0000",
+        "couleur": "bleu",
+        "eclairage": "Très lumineux",
+        "hex": "40333c",
         "rgb": [
-            255,
-            0,
-            0
+            64,
+            51,
+            60
         ],
-        "date": "2026-06-11T01:56:38"
+        "date": "2026-06-12T17:25:53"
     },
     {
-        "couleur": "Vert",
-        "eclairage": "Lumineux",
-        "hex": "00ff00",
+        "couleur": "violet",
+        "eclairage": "Très lumineux",
+        "hex": "2f1719",
         "rgb": [
-            0,
-            255,
-            0
+            47,
+            23,
+            25
         ],
-        "date": "2026-06-11T01:56:38"
+        "date": "2026-06-12T17:26:02"
     },
     {
-        "couleur": "Bleu",
-        "eclairage": "Lumineux",
-        "hex": "0000ff",
+        "couleur": "rouge",
+        "eclairage": "Très lumineux",
+        "hex": "7f1a19",
         "rgb": [
-            0,
-            0,
-            255
+            127,
+            26,
+            25
         ],
-        "date": "2026-06-11T01:56:38"
-    },
-    {
-        "couleur": "Jaune",
-        "eclairage": "Lumineux",
-        "hex": "ffff00",
-        "rgb": [
-            255,
-            255,
-            0
-        ],
-        "date": "2026-06-11T01:56:38"
-    },
-    {
-        "couleur": "Magenta",
-        "eclairage": "Lumineux",
-        "hex": "ff00ff",
-        "rgb": [
-            255,
-            0,
-            255
-        ],
-        "date": "2026-06-11T01:56:38"
-    },
-    {
-        "couleur": "Cyan",
-        "eclairage": "Lumineux",
-        "hex": "00ffff",
-        "rgb": [
-            0,
-            255,
-            255
-        ],
-        "date": "2026-06-11T01:56:38"
-    },
-    {
-        "couleur": "Blanc",
-        "eclairage": "Lumineux",
-        "hex": "ffffff",
-        "rgb": [
-            255,
-            255,
-            255
-        ],
-        "date": "2026-06-11T01:56:38"
-    },
-    {
-        "couleur": "Noir",
-        "eclairage": "Lumineux",
-        "hex": "000000",
-        "rgb": [
-            0,
-            0,
-            0
-        ],
-        "date": "2026-06-11T01:56:38"
-    },
-    {
-        "couleur": "Rouge",
-        "eclairage": "Lumineux",
-        "hex": "ff0000",
-        "rgb": [
-            255,
-            0,
-            0
-        ],
-        "date": "2026-06-11T01:57:34"
-    },
-    {
-        "couleur": "Vert",
-        "eclairage": "Lumineux",
-        "hex": "00ff00",
-        "rgb": [
-            0,
-            255,
-            0
-        ],
-        "date": "2026-06-11T01:57:34"
-    },
-    {
-        "couleur": "Bleu",
-        "eclairage": "Lumineux",
-        "hex": "0000ff",
-        "rgb": [
-            0,
-            0,
-            255
-        ],
-        "date": "2026-06-11T01:57:34"
-    },
-    {
-        "couleur": "Jaune",
-        "eclairage": "Lumineux",
-        "hex": "ffff00",
-        "rgb": [
-            255,
-            255,
-            0
-        ],
-        "date": "2026-06-11T01:57:34"
-    },
-    {
-        "couleur": "Magenta",
-        "eclairage": "Lumineux",
-        "hex": "ff00ff",
-        "rgb": [
-            255,
-            0,
-            255
-        ],
-        "date": "2026-06-11T01:57:34"
-    },
-    {
-        "couleur": "Cyan",
-        "eclairage": "Lumineux",
-        "hex": "00ffff",
-        "rgb": [
-            0,
-            255,
-            255
-        ],
-        "date": "2026-06-11T01:57:34"
-    },
-    {
-        "couleur": "Blanc",
-        "eclairage": "Lumineux",
-        "hex": "ffffff",
-        "rgb": [
-            255,
-            255,
-            255
-        ],
-        "date": "2026-06-11T01:57:34"
-    },
-    {
-        "couleur": "Noir",
-        "eclairage": "Lumineux",
-        "hex": "000000",
-        "rgb": [
-            0,
-            0,
-            0
-        ],
-        "date": "2026-06-11T01:57:35"
-    },
-    {
-        "couleur": "Rouge",
-        "eclairage": "Lumineux",
-        "hex": "ff0000",
-        "rgb": [
-            255,
-            0,
-            0
-        ],
-        "date": "2026-06-11T01:58:38"
-    },
-    {
-        "couleur": "Vert",
-        "eclairage": "Lumineux",
-        "hex": "00ff00",
-        "rgb": [
-            0,
-            255,
-            0
-        ],
-        "date": "2026-06-11T01:58:38"
-    },
-    {
-        "couleur": "Bleu",
-        "eclairage": "Lumineux",
-        "hex": "0000ff",
-        "rgb": [
-            0,
-            0,
-            255
-        ],
-        "date": "2026-06-11T01:58:38"
-    },
-    {
-        "couleur": "Jaune",
-        "eclairage": "Lumineux",
-        "hex": "ffff00",
-        "rgb": [
-            255,
-            255,
-            0
-        ],
-        "date": "2026-06-11T01:58:38"
-    },
-    {
-        "couleur": "Magenta",
-        "eclairage": "Lumineux",
-        "hex": "ff00ff",
-        "rgb": [
-            255,
-            0,
-            255
-        ],
-        "date": "2026-06-11T01:58:38"
-    },
-    {
-        "couleur": "Cyan",
-        "eclairage": "Lumineux",
-        "hex": "00ffff",
-        "rgb": [
-            0,
-            255,
-            255
-        ],
-        "date": "2026-06-11T01:58:38"
-    },
-    {
-        "couleur": "Blanc",
-        "eclairage": "Lumineux",
-        "hex": "ffffff",
-        "rgb": [
-            255,
-            255,
-            255
-        ],
-        "date": "2026-06-11T01:58:38"
-    },
-    {
-        "couleur": "Noir",
-        "eclairage": "Lumineux",
-        "hex": "000000",
-        "rgb": [
-            0,
-            0,
-            0
-        ],
-        "date": "2026-06-11T01:58:38"
-    },
-    {
-        "couleur": "Rouge",
-        "eclairage": "Lumineux",
-        "hex": "ff0000",
-        "rgb": [
-            255,
-            0,
-            0
-        ],
-        "date": "2026-06-11T02:01:18"
-    },
-    {
-        "couleur": "Vert",
-        "eclairage": "Lumineux",
-        "hex": "00ff00",
-        "rgb": [
-            0,
-            255,
-            0
-        ],
-        "date": "2026-06-11T02:01:18"
-    },
-    {
-        "couleur": "Bleu",
-        "eclairage": "Lumineux",
-        "hex": "0000ff",
-        "rgb": [
-            0,
-            0,
-            255
-        ],
-        "date": "2026-06-11T02:01:18"
-    },
-    {
-        "couleur": "Jaune",
-        "eclairage": "Lumineux",
-        "hex": "ffff00",
-        "rgb": [
-            255,
-            255,
-            0
-        ],
-        "date": "2026-06-11T02:01:18"
-    },
-    {
-        "couleur": "Magenta",
-        "eclairage": "Lumineux",
-        "hex": "ff00ff",
-        "rgb": [
-            255,
-            0,
-            255
-        ],
-        "date": "2026-06-11T02:01:18"
-    },
-    {
-        "couleur": "Cyan",
-        "eclairage": "Lumineux",
-        "hex": "00ffff",
-        "rgb": [
-            0,
-            255,
-            255
-        ],
-        "date": "2026-06-11T02:01:18"
-    },
-    {
-        "couleur": "Blanc",
-        "eclairage": "Lumineux",
-        "hex": "ffffff",
-        "rgb": [
-            255,
-            255,
-            255
-        ],
-        "date": "2026-06-11T02:01:18"
-    },
-    {
-        "couleur": "Noir",
-        "eclairage": "Lumineux",
-        "hex": "000000",
-        "rgb": [
-            0,
-            0,
-            0
-        ],
-        "date": "2026-06-11T02:01:18"
-    },
-    {
-        "couleur": "Rouge",
-        "eclairage": "Lumineux",
-        "hex": "ff0000",
-        "rgb": [
-            255,
-            0,
-            0
-        ],
-        "date": "2026-06-11T02:04:44"
-    },
-    {
-        "couleur": "Vert",
-        "eclairage": "Lumineux",
-        "hex": "00ff00",
-        "rgb": [
-            0,
-            255,
-            0
-        ],
-        "date": "2026-06-11T02:04:44"
-    },
-    {
-        "couleur": "Bleu",
-        "eclairage": "Lumineux",
-        "hex": "0000ff",
-        "rgb": [
-            0,
-            0,
-            255
-        ],
-        "date": "2026-06-11T02:04:44"
-    },
-    {
-        "couleur": "Jaune",
-        "eclairage": "Lumineux",
-        "hex": "ffff00",
-        "rgb": [
-            255,
-            255,
-            0
-        ],
-        "date": "2026-06-11T02:04:44"
-    },
-    {
-        "couleur": "Magenta",
-        "eclairage": "Lumineux",
-        "hex": "ff00ff",
-        "rgb": [
-            255,
-            0,
-            255
-        ],
-        "date": "2026-06-11T02:04:44"
-    },
-    {
-        "couleur": "Cyan",
-        "eclairage": "Lumineux",
-        "hex": "00ffff",
-        "rgb": [
-            0,
-            255,
-            255
-        ],
-        "date": "2026-06-11T02:04:44"
-    },
-    {
-        "couleur": "Blanc",
-        "eclairage": "Lumineux",
-        "hex": "ffffff",
-        "rgb": [
-            255,
-            255,
-            255
-        ],
-        "date": "2026-06-11T02:04:44"
-    },
-    {
-        "couleur": "Noir",
-        "eclairage": "Lumineux",
-        "hex": "000000",
-        "rgb": [
-            0,
-            0,
-            0
-        ],
-        "date": "2026-06-11T02:04:44"
-    },
-    {
-        "couleur": "Rouge",
-        "eclairage": "Lumineux",
-        "hex": "ff0000",
-        "rgb": [
-            255,
-            0,
-            0
-        ],
-        "date": "2026-06-11T02:05:18"
-    },
-    {
-        "couleur": "Vert",
-        "eclairage": "Lumineux",
-        "hex": "00ff00",
-        "rgb": [
-            0,
-            255,
-            0
-        ],
-        "date": "2026-06-11T02:05:18"
-    },
-    {
-        "couleur": "Bleu",
-        "eclairage": "Lumineux",
-        "hex": "0000ff",
-        "rgb": [
-            0,
-            0,
-            255
-        ],
-        "date": "2026-06-11T02:05:18"
-    },
-    {
-        "couleur": "Jaune",
-        "eclairage": "Lumineux",
-        "hex": "ffff00",
-        "rgb": [
-            255,
-            255,
-            0
-        ],
-        "date": "2026-06-11T02:05:18"
-    },
-    {
-        "couleur": "Magenta",
-        "eclairage": "Lumineux",
-        "hex": "ff00ff",
-        "rgb": [
-            255,
-            0,
-            255
-        ],
-        "date": "2026-06-11T02:05:18"
-    },
-    {
-        "couleur": "Cyan",
-        "eclairage": "Lumineux",
-        "hex": "00ffff",
-        "rgb": [
-            0,
-            255,
-            255
-        ],
-        "date": "2026-06-11T02:05:18"
-    },
-    {
-        "couleur": "Blanc",
-        "eclairage": "Lumineux",
-        "hex": "ffffff",
-        "rgb": [
-            255,
-            255,
-            255
-        ],
-        "date": "2026-06-11T02:05:18"
-    },
-    {
-        "couleur": "Noir",
-        "eclairage": "Lumineux",
-        "hex": "000000",
-        "rgb": [
-            0,
-            0,
-            0
-        ],
-        "date": "2026-06-11T02:05:18"
-    },
-    {
-        "couleur": "Rouge",
-        "eclairage": "Lumineux",
-        "hex": "ff0000",
-        "rgb": [
-            255,
-            0,
-            0
-        ],
-        "date": "2026-06-11T02:05:44"
-    },
-    {
-        "couleur": "Vert",
-        "eclairage": "Lumineux",
-        "hex": "00ff00",
-        "rgb": [
-            0,
-            255,
-            0
-        ],
-        "date": "2026-06-11T02:05:44"
-    },
-    {
-        "couleur": "Bleu",
-        "eclairage": "Lumineux",
-        "hex": "0000ff",
-        "rgb": [
-            0,
-            0,
-            255
-        ],
-        "date": "2026-06-11T02:05:44"
-    },
-    {
-        "couleur": "Jaune",
-        "eclairage": "Lumineux",
-        "hex": "ffff00",
-        "rgb": [
-            255,
-            255,
-            0
-        ],
-        "date": "2026-06-11T02:05:44"
-    },
-    {
-        "couleur": "Magenta",
-        "eclairage": "Lumineux",
-        "hex": "ff00ff",
-        "rgb": [
-            255,
-            0,
-            255
-        ],
-        "date": "2026-06-11T02:05:44"
-    },
-    {
-        "couleur": "Cyan",
-        "eclairage": "Lumineux",
-        "hex": "00ffff",
-        "rgb": [
-            0,
-            255,
-            255
-        ],
-        "date": "2026-06-11T02:05:44"
-    },
-    {
-        "couleur": "Blanc",
-        "eclairage": "Lumineux",
-        "hex": "ffffff",
-        "rgb": [
-            255,
-            255,
-            255
-        ],
-        "date": "2026-06-11T02:05:44"
-    },
-    {
-        "couleur": "Noir",
-        "eclairage": "Lumineux",
-        "hex": "000000",
-        "rgb": [
-            0,
-            0,
-            0
-        ],
-        "date": "2026-06-11T02:05:44"
-    },
-    {
-        "couleur": "Rouge",
-        "eclairage": "Lumineux",
-        "hex": "ff0000",
-        "rgb": [
-            255,
-            0,
-            0
-        ],
-        "date": "2026-06-11T02:06:46"
-    },
-    {
-        "couleur": "Vert",
-        "eclairage": "Lumineux",
-        "hex": "00ff00",
-        "rgb": [
-            0,
-            255,
-            0
-        ],
-        "date": "2026-06-11T02:06:46"
-    },
-    {
-        "couleur": "Bleu",
-        "eclairage": "Lumineux",
-        "hex": "0000ff",
-        "rgb": [
-            0,
-            0,
-            255
-        ],
-        "date": "2026-06-11T02:06:47"
-    },
-    {
-        "couleur": "Jaune",
-        "eclairage": "Lumineux",
-        "hex": "ffff00",
-        "rgb": [
-            255,
-            255,
-            0
-        ],
-        "date": "2026-06-11T02:06:47"
-    },
-    {
-        "couleur": "Magenta",
-        "eclairage": "Lumineux",
-        "hex": "ff00ff",
-        "rgb": [
-            255,
-            0,
-            255
-        ],
-        "date": "2026-06-11T02:06:47"
-    },
-    {
-        "couleur": "Cyan",
-        "eclairage": "Lumineux",
-        "hex": "00ffff",
-        "rgb": [
-            0,
-            255,
-            255
-        ],
-        "date": "2026-06-11T02:06:47"
-    },
-    {
-        "couleur": "Blanc",
-        "eclairage": "Lumineux",
-        "hex": "ffffff",
-        "rgb": [
-            255,
-            255,
-            255
-        ],
-        "date": "2026-06-11T02:06:47"
-    },
-    {
-        "couleur": "Noir",
-        "eclairage": "Lumineux",
-        "hex": "000000",
-        "rgb": [
-            0,
-            0,
-            0
-        ],
-        "date": "2026-06-11T02:06:47"
+        "date": "2026-06-12T17:26:19"
     }
 ]

@@ -6,11 +6,11 @@ from PyQt6.QtWidgets import (
 from approbot.calibrateur_couleurs import CalibrateurCouleurs
 
 class OngletCalibration(QWidget):
-    def __init__(self, connexion):
+    def __init__(self, connexion, calibrateur=None):
         super().__init__()
 
         self.connexion = connexion
-        self.calibrateur = CalibrateurCouleurs(self.connexion)
+        self.calibrateur = calibrateur if calibrateur is not None else CalibrateurCouleurs(connexion)
 
         layout = QVBoxLayout()
         layout.addWidget(QLabel("Calibration des couleurs"))
@@ -39,20 +39,25 @@ class OngletCalibration(QWidget):
         self.setLayout(layout)
 
     def ajouter_mesure(self):
-        couleur = self.champ_nom.text()
+        couleur = self.champ_nom.text().strip()
         condition = self.combobox_condition.currentText()
 
         if couleur == "":
             self.console.addItem("Erreur : entre un nom de couleur")
             return
-        try :
-            self.calibrateur.ajouter_mesure(
+        try:
+            mesure = self.calibrateur.ajouter_mesure(
                 couleur_reelle=couleur,
                 eclairage=condition
             )
+            self.console.addItem(
+                f"✓ '{couleur}' enregistré — hex: {mesure['hex']}  ({condition})"
+            )
+            self.console.scrollToBottom()
+            self.champ_nom.clear()
+
         except RuntimeError as e:
-            self.console.addItem(f"{e}")
+            self.console.addItem(f"Erreur : {e}")
 
         except Exception as e:
             self.console.addItem(f"Erreur calibration : {e}")
-        
