@@ -1,3 +1,8 @@
+'''
+Interface principale
+Fenêtre graphique de l'arbitre
+'''
+
 import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
@@ -37,8 +42,14 @@ import ctypes
 
 
 class FenetrePrincipale(QMainWindow):
+    '''
+    Fenêtre principale de l'application arbitre
+    '''
 
     def __init__(self):
+        '''
+        Constructeur : initialise la fenêtre et tous ses composants
+        '''
         super().__init__()
         self.flask_thread: FlaskThread | None = None
         self.battle_charge = False
@@ -49,7 +60,11 @@ class FenetrePrincipale(QMainWindow):
         self.connecter_signaux()
         self.rafraichir_tables()
 
+
     def construire_ui(self):
+        '''
+        Construit toute l'interface graphique : widgets, layouts, etc
+        '''
         central = QWidget()
         self.setCentralWidget(central)
         root = QVBoxLayout(central)
@@ -185,7 +200,14 @@ class FenetrePrincipale(QMainWindow):
         self.lbl_battle_info = QLabel("")
         self.status.addPermanentWidget(self.lbl_battle_info)
 
+
     def connecter_signaux(self):
+        '''
+        Connecte les signaux/événements aux méthodes correspondantes
+        Un signal est connecté à une méthode
+        Quand le signal est émis, la méthode est automatiquement appelé
+
+        '''
         self.btn_start.clicked.connect(self.demarrer_serveur)
         self.btn_stop.clicked.connect(self.arreter_serveur)
         self.btn_battle.clicked.connect(self.charger_battle)
@@ -199,22 +221,10 @@ class FenetrePrincipale(QMainWindow):
 
     def lancer_firewall_helper(self, action: str, port: int) -> bool:
         """
-        Lance Marty Supreme Firewall.exe en administrateur.
-
-        action : "add" ou "delete"
-        port   : port du serveur Flask, ex 8080
+        Lance Marty Supreme Firewall.exe en administrateur
         """
-        racine_projet = os.path.dirname(
-            os.path.dirname(
-                os.path.dirname(os.path.abspath(__file__))
-            )
-        )
-
-        chemin_helper = os.path.join(
-            racine_projet,
-            "dist",
-            "AppServer-Firewall.exe"
-        )
+        racine_projet = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        chemin_helper = os.path.join(racine_projet,"dist","AppServer-Firewall.exe")
 
         if not os.path.exists(chemin_helper):
             self._log(f"Helper pare-feu introuvable : {chemin_helper}", "#e74c3c")
@@ -222,18 +232,14 @@ class FenetrePrincipale(QMainWindow):
             print(r'.\.venv\Scripts\python.exe -m PyInstaller --onefile --windowed --uac-admin --icon="appserver\ui\assets\logo.ico" --name "AppServer-Firewall" firewall_helper.py')
             return False
 
-        resultat = ctypes.windll.shell32.ShellExecuteW(
-            None,
-            "runas",
-            chemin_helper,
-            f"{action} {port}",
-            None,
-            0
-        )
-
+        resultat = ctypes.windll.shell32.ShellExecuteW(None, "runas", chemin_helper, f"{action} {port}", None, 0)
         return resultat > 32
 
     def demarrer_serveur(self):
+        '''
+        Démarre le serveur Flask dans un thread séparé
+        Appelé quand l'utilisateur clique sur le bouton démarrer
+        '''
         try:
             self.port_actuel = int(self.spin_port.text())
         except ValueError:
@@ -247,15 +253,18 @@ class FenetrePrincipale(QMainWindow):
             return
 
         self._log("Règle pare-feu temporaire ajoutée.", "#2ecc71")
-
         self.flask_thread = FlaskThread(self.port_actuel)
         self.flask_thread.start()
-
         self.btn_start.setEnabled(False)
         self.btn_stop.setEnabled(True)
         self.spin_port.setEnabled(False)
 
+
     def arreter_serveur(self):
+        '''
+        Arrête proprement le serveur Flask
+        Appelé quand l'utilisateur clique sur le bouton arrêter
+        '''
         if self.flask_thread:
             self.flask_thread.stop()
             self.flask_thread.wait(3000)
@@ -273,7 +282,12 @@ class FenetrePrincipale(QMainWindow):
         self.spin_port.setEnabled(True)
         self.maj_status()
 
+
     def charger_battle(self):
+        '''
+        Ouvre pour sélectionner un fichier .battle, puis charge ses règles
+        Appelé quand l'utilisateur clique sur le bouton charger .battle
+        '''
         chemin, _ = QFileDialog.getOpenFileName(self, "Charger un fichier .battle", "", "Battle files (*.battle);;All files (*)")
         if not chemin:
             return
@@ -284,15 +298,28 @@ class FenetrePrincipale(QMainWindow):
         self._log(f"Fichier chargé : {nom}", "#f39c12")
         self.maj_status()
 
+
     def robot_enregistre(self, rid: str):
+        '''
+        Appelé quand un nouveau robot se connecte
+        '''
         self._log(f"Nouveau robot connecté : {rid}", "#2ecc71")
         self.rafraichir_tables()
 
+
     def robot_deconnecte(self, rid: str):
+        '''
+        Appelé quand un robot se déconnecte
+        '''
         self._log(f"Robot déconnecté : {rid}", "#e74c3c")
         self.rafraichir_tables()
 
+
     def pas_recu(self, rid: str, col: str, arm: str, exp: str, points: int):
+        '''
+        Appelé à chaque réception d'un pas de danse
+        Ajoute une ligne colorée dans le log
+        '''
         couleur_hex, couleur_nom = COLOR_MAP.get(col, ('#888', col))
         signe = "+" if points >= 0 else ""
         pts_str = f"{signe}{points} pt{'s' if abs(points) != 1 else ''}"
@@ -307,21 +334,39 @@ class FenetrePrincipale(QMainWindow):
         self.log.insertHtml(html)
         self.log.moveCursor(QTextCursor.MoveOperation.End)
 
+
     def serveur_demarre(self, port: int):
+        '''
+        Appelé quand le serveur Flask est prêt
+        '''
         self._log(f"Serveur démarré sur le port {port}", "#3498db")
         self.maj_status()
 
+
     def serveur_arrete(self):
+        '''
+        Appelé quand le serveur Flask s'est arrêté
+        '''
         self._log("Serveur arrêté.", "#e74c3c")
         self.maj_status()
 
+
     def _log(self, texte: str, couleur: str = "#9aa0bf"):
+        '''
+        Ajoute un message simple dans le log
+        Utilisé pour les messages système
+        '''
         heure = datetime.now().strftime("%H:%M:%S")
         self.log.moveCursor(QTextCursor.MoveOperation.End)
         self.log.insertHtml(f'<span style="color:{couleur}">{texte}</span><br>')
         self.log.moveCursor(QTextCursor.MoveOperation.End)
 
+
     def rafraichir_tables(self):
+        '''
+        Remet à jour les deux tableaux (robots connectés + classement) depuis les données actuelles
+        Appelé à chaque changement de score ou de connexion
+        '''
         self.table_robots.setRowCount(0)
         for robot in robots_connus:
             row = self.table_robots.rowCount()
@@ -350,14 +395,23 @@ class FenetrePrincipale(QMainWindow):
             s_item.setForeground(QColor("#f1c40f" if i == 0 else "#9aa0bf"))
             self.table_class.setItem(row, 2, s_item)
 
+
     def maj_status(self):
+        '''
+        Met à jour le texte de la barre de statut en bas de la fenêtre
+        Reflète l'état actuel du serveur et du fichier .battle
+        '''
         en_marche = self.flask_thread is not None and self.flask_thread.isRunning()
         srv_txt = f"🟢 Serveur actif  -  port {self.spin_port.text()}" if en_marche else "🔴 Serveur arrêté"
         battle_txt = "Fichier .battle chargé" if self.battle_charge else "Aucun fichier .battle"
         self.lbl_status.setText(f"{srv_txt}  -  {battle_txt}")
 
+
     def closeEvent(self, event):
+        '''
+        Appelé automatiquement par Qt quand l'utilisateur ferme la fenêtre
+        S'assure que le serveur Flask est bien arrêté avant de quitter
+        '''
         if self.flask_thread and self.flask_thread.isRunning():
             self.arreter_serveur()
-
         event.accept()
