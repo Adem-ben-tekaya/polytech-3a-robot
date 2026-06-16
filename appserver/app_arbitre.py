@@ -1,3 +1,8 @@
+"""
+Point d'entrée de l'application
+Lance l'interface graphique PyQt et le serveur arbitre
+"""
+
 import sys
 import os
 import argparse
@@ -11,7 +16,6 @@ base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 import ctypes
 
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("server.marty.app")
-
 chemin_icone = os.path.join(base_dir,"appserver", "ui", "assets", "logo.ico")
 
 from ui.style import STYLE
@@ -25,11 +29,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     app = QApplication(sys.argv)
-
     app.setWindowIcon(QIcon(chemin_icone))
-
     app.setStyleSheet(STYLE)
-
     fenetre = FenetrePrincipale()
 
     if args.port != 8080:
@@ -43,5 +44,4 @@ if __name__ == '__main__':
         fenetre.maj_status()
 
     fenetre.show()
-
     sys.exit(app.exec())

@@ -1,3 +1,8 @@
+'''
+Gestion des règles et des scores
+Lecture du fichier .battle et calcul des points.
+'''
+
 import json
 import os
 
@@ -9,6 +14,9 @@ FICHIER_CLASSEMENT = os.path.join(DOSSIER_ACTUEL, "classement.json")
 
 
 def lister_robots():
+    '''
+    Affiche dans la console la liste de tous les robots actuellement connectés
+    '''
     if not robots_connus:
         print("Aucun robot enregistré !")
     else:
@@ -18,28 +26,31 @@ def lister_robots():
 
 
 def afficher_reception(couleur, bras, exp, points):
+    '''
+    Affiche dans la console les détails d'un pas de danse reçu
+    '''
     print(f"Case : {couleur}, bras : {bras}, expression : {exp} et points : {points}")
 
 
 def afficher_scores():
+    '''
+    Affiche dans la console le classement actuel, trié par score décroissant
+    '''
     print("Scores :")
-
     if not robots_connus:
         print("Aucun robot enregistré !")
         return
-    
-    classement = sorted(
-        robots_connus, 
-        key=lambda x: x[2], 
-        reverse=True #Tri par score décroissant
-        )
-    
-    for i,info in enumerate(classement,start=1):
+    classement = sorted(robots_connus, key=lambda x: x[2], reverse=True)    #Tri par ordre décroissant
+    i=1
+    for info in classement :
         print(f" #{i}, ID : {info[0]}, Nom : {info[1]}, Score : {info[2]}")
+        i=i+1
 
 
 def charger_battle(chemin_fichier):
-
+    '''
+    Lit un fichier .battle et remplit le dictionnaire regles_battle
+    '''
     global regles_battle    #Pour modifier regles_battle en dehors de la fonction
     regles_battle = {}
     couleur = None
@@ -47,7 +58,7 @@ def charger_battle(chemin_fichier):
     try:
         with open(chemin_fichier, 'r', encoding='utf-8') as f:
             for ligne in f:
-                ligne = ligne.strip()
+                ligne = ligne.strip()   #Supprime les espaces et sauts de ligne
 
                 if not ligne:
                     continue
@@ -91,6 +102,9 @@ def charger_battle(chemin_fichier):
 
 
 def calculer_points(couleur, bras, exp):
+    '''
+    Calcule le nombre de points gagnés par un robot pour un pas de danse
+    '''
 
     if not regles_battle:
         return 0
@@ -132,6 +146,10 @@ def calculer_points(couleur, bras, exp):
 
 
 def charger_classement():
+    '''
+    Charge le classement depuis le fichier JSON
+    Retourne une liste de dictionnaires triée par score décroissant, [] si le fichier n'existe pas ou est illisible
+    '''
     if not os.path.exists(FICHIER_CLASSEMENT):
         return []
     try:
@@ -140,11 +158,19 @@ def charger_classement():
     except Exception:
         return []
 
+
 def sauvegarder_classement(classement):
+    '''
+    Écrit le classement dans le fichier JSON
+    '''
     with open(FICHIER_CLASSEMENT, "w", encoding="utf-8") as f:
         json.dump(classement, f, indent=4, ensure_ascii=False)
 
+
 def mettre_a_jour_classement(nom, score):
+    '''
+    Ajoute le score final d'un robot au classement et ne garde que les 10 meilleurs
+    '''
     classement = charger_classement()
     classement.append({"nom": nom, "score": score})
     classement.sort(key=lambda x: x["score"], reverse=True)

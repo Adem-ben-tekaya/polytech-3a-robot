@@ -1,3 +1,11 @@
+'''
+Feuille de style QT
+Personnalisation visuelle de l'application
+
+La feuille est appliquée une seule fois au démarrage via app.setStyleSheet(STYLE).
+'''
+
+
 STYLE = """
 
 QMainWindow, QWidget {
@@ -31,7 +39,7 @@ QPushButton {
     color: #dadce6;
 }
 
-QPushButton:hover   { background-color: #1e2130; border-color: #ff4f6d; color: #ff4f6d; }
+QPushButton:hover { background-color: #1e2130; border-color: #ff4f6d; color: #ff4f6d; }
 QPushButton:pressed { background-color: #ff4f6d; color: #0d0f14; }
 
 QPushButton#btn_start {
@@ -42,7 +50,7 @@ QPushButton#btn_start {
     letter-spacing: 2px;
 }
 
-QPushButton#btn_start:hover   { background-color: #2ecc71; color: #0d0f14; }
+QPushButton#btn_start:hover { background-color: #2ecc71; color: #0d0f14; }
 
 QPushButton#btn_stop {
     background-color: #3a1a1a;
@@ -52,7 +60,7 @@ QPushButton#btn_stop {
     letter-spacing: 2px;
 }
 
-QPushButton#btn_stop:hover   { background-color: #ff4f6d; color: #0d0f14; }
+QPushButton#btn_stop:hover { background-color: #ff4f6d; color: #0d0f14; }
 
 QTableWidget {
     background-color: #10121a;
@@ -112,6 +120,8 @@ QStatusBar {
 QSplitter::handle { background-color: #1e2130; }
 """
 
+
+#Dictionnaire de correspondance couleur/code utilisé pour afficher la couleur de case reçue dans le log avec la bonne couleur de fond
 COLOR_MAP = {
     'N': ('#3a3a3a', 'NOIR'),
     'P': ('#9b59b6', 'MAUVE'),
