@@ -125,10 +125,11 @@ class MouvementMarty:
             marty.disco_off(api='led')
 
         elif token == "67" :
+            marty.set_blocking(False)
             marty.eyes(config["eyes"], move_time=1000)
             for _ in range(4):
-                self.set_bras("ARU", "ALB")
-                self.set_bras("ARB", "ALU")
+                self.set_bras(["ARU","ALB"])
+                self.set_bras(["ARB","ALU"])
             marty.disco_off(api='led')
 
     def reset_position(self) -> None:
