@@ -17,7 +17,9 @@ class CalibrateurCouleurs:
 
 
     def _nom_capteur_couleur(self) -> str:
-        """Découvre le nom réel de l'add-on capteur couleur déclaré par le robot."""
+        """
+        Découvre le nom réel de l'add-on capteur couleur déclaré par le robot.
+        """
         addons = self.connexion.marty.get_add_ons_status()
         for addon in addons.values():
             if isinstance(addon, dict) and addon.get('whoAmI', '').lower() == 'coloursensor':
@@ -33,7 +35,7 @@ class CalibrateurCouleurs:
         Retourne une chaîne "rrggbb".
         """
         if self.connexion is None:
-            raise RuntimeError("Impossible de lire Marty : aucune connexion fournie")
+            raise RuntimeError("Impossible de communique avec Marty : aucune connexion fournie")
 
         if not self.connexion.is_connected():
             raise RuntimeError("Marty n'est pas connecté")
@@ -117,7 +119,7 @@ class CalibrateurCouleurs:
         return meilleure_couleur, round(meilleure_distance, 2)
 
 
-    # Gestion du fichier de calibration
+    #### Gestion du fichier de calibration
     def sauvegarder_calibration(self):
         with open(self.nom_fichier, "w", encoding="utf-8") as fichier:
             json.dump(self.mesures, fichier, indent=4, ensure_ascii=False)
@@ -134,7 +136,8 @@ class CalibrateurCouleurs:
         except Exception:
             self.mesures = []
 
-    # Helpers
+
+    #### Helpers ####
     @staticmethod
     def nettoyer_hex(valeur_hex):
         """
@@ -156,6 +159,10 @@ class CalibrateurCouleurs:
 
     @staticmethod
     def hex_vers_rgb(clean_valeur_hex):
+        """
+        Converti une valeur hexadécimal en valeur RGB
+        Ex: ff34ad -> [255, 52, 173]
+        """
         r = int(clean_valeur_hex[0:2], 16)
         g = int(clean_valeur_hex[2:4], 16)
         b = int(clean_valeur_hex[4:6], 16)
@@ -163,6 +170,9 @@ class CalibrateurCouleurs:
 
     @staticmethod
     def distance_rgb(rgb1, rgb2):
+        """
+        Calcul savant de la distance entre deux couleurs
+        """
         return math.sqrt(
             (rgb1[0] - rgb2[0]) ** 2 +
             (rgb1[1] - rgb2[1]) ** 2 +

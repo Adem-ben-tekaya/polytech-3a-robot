@@ -41,12 +41,12 @@ class MartySupreme(QWidget):
         self.onglet_dance = OngletDance(self.connexion, self.calibration, self.serveur)
 
         self.setWindowTitle("Marty Supreme")
-        self.setWindowIcon(QIcon(chemin_icone))
+        self.setWindowIcon(QIcon(chemin_icone)) #Définir une icône personalisée
         self.resize(900, 600)
 
         layout = QVBoxLayout()
 
-        self.tabs = QTabWidget()
+        self.tabs = QTabWidget() #Afin d'avoir une application facile a prendre en main on utilise des onglets de PyQt
 
         self.tabs.addTab(
             OngletConnexion(self.connexion),
@@ -75,6 +75,12 @@ class MartySupreme(QWidget):
         self.setLayout(layout)
 
     def closeEvent(self, event):
+        """
+        Gestion des arrets innnatendus pour éviter de 
+        conserver une connexion avec marty ou avec le 
+        serveur et de garder la dance en mémoire apres 
+        la fermeture de l'appli.
+        """
         try:
             self.onglet_dance.cleanup()
         except Exception:
@@ -96,13 +102,11 @@ class MartySupreme(QWidget):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
-    app.setWindowIcon(QIcon(chemin_icone))
-
     app.setFont(QFont("Segoe UI", 10))
 
-    app.setStyleSheet(STYLE)
+    app.setStyleSheet(STYLE) #Définir un style QSS
 
     window = MartySupreme()
-    window.show()
+    window.showMaximized()
 
     sys.exit(app.exec())

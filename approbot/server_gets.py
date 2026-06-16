@@ -23,6 +23,11 @@ class ServerGets:
         return reponse.text
 
     def hello(self):
+        """
+        POST /hello
+        Cette requête est très importante car elle donne son identifiant au Marty.
+        Cet identifiant est indispensable pour les autres requêtes.
+        """
         self._check_url()
 
         reponse = requests.post(
@@ -44,6 +49,10 @@ class ServerGets:
         return data
 
     def start(self):
+        """
+        POST /start
+        Anonce au serveur que le robot est prêt a commencer la battle.
+        """
         self._check_url()
         self._check_rid()
 
@@ -166,6 +175,13 @@ class ServerGets:
         self.rid = None
 
     def nom_robot(self, nom):
+        """
+        Optionel
+        POST/name
+
+        Permet a marty de substituer son IP 
+        par un nom de son choix pour le classement
+        """
         self._check_url()
         self._check_rid()
 
@@ -179,6 +195,11 @@ class ServerGets:
 
     @staticmethod
     def sonder_serveur(ip: str, timeout=1):
+        """
+        Boucle sur toute les IPs du réseau entré par 
+        l'utilisateur afin de trouver un appareil qui 
+        repondra à http://{ip}:8080/
+        """
         try:
             reponse = requests.get(f"http://{ip}:8080/",timeout=timeout)
             if reponse.status_code != 200:
@@ -189,6 +210,9 @@ class ServerGets:
             return None
         
     def deconnecter(self):
+        """
+        Déconnecter le robot du serveur arbitre
+        """
         if not self.est_enregistre():
             print("Aucun rid enregistré, pas de /bye à envoyer.")
             return False
@@ -202,7 +226,7 @@ class ServerGets:
             print(f"Erreur pendant /bye : {e}")
             return False
 
-
+    #### Helpers ####
     def est_enregistre(self):
         return self.rid is not None
 
@@ -215,6 +239,9 @@ class ServerGets:
             raise RuntimeError("Robot non enregistré. Il faut appeler hello() avant.")
         
 if __name__ == "__main__":
+    """
+    Tests de connexion a un serveur et simulation complete des requêtes api
+    """
     serveur = ServerGets()
 
     serveur.definir_url("192.168.1.7")

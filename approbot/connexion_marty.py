@@ -2,19 +2,16 @@ import threading
 import urllib.request
 import json
 
-
-# Mots-clés recherchés dans la réponse HTTP pour identifier un Marty
-_MARTY_KEYWORDS = ('marty', 'ric', 'robotical')
 # Timeout (secondes) par hôte lors du scan réseau
 _SCAN_TIMEOUT = 0.5 #Anciennement 1.5
 # Nombre maximum de threads parallèles lors du scan
 _MAX_THREADS = 64
-# Stocke les eventuels serveur trouvés
-_SERVERS_DISCOVERED = []
 
 
 class ConnexionMarty:
-    """Gère la connexion à un robot Marty via martypy (Wi-Fi)."""
+    """
+    Gère la connexion à un robot Marty via martypy (Wi-Fi).
+    """
 
     def __init__(self):
         self._marty = None
@@ -22,7 +19,10 @@ class ConnexionMarty:
         self._ip = None
 
     def connecter(self, ip: str) -> None:
-        """Connecte le robot Marty à l'adresse *ip*.  Lève une exception en cas d'échec."""
+        """
+        Connecte le robot Marty à l'adresse *ip*.  
+        Lève une exception en cas d'échec.
+        """
         from martypy import Marty
 
         marty = Marty('wifi', ip, blocking=True)
@@ -31,7 +31,9 @@ class ConnexionMarty:
         self._ip = ip
 
     def deconnecter(self) -> None:
-        """Déconnecte le robot proprement."""
+        """
+        Déconnecte le robot proprement.
+        """
         if self._marty is None:
             return
         try:
@@ -49,11 +51,22 @@ class ConnexionMarty:
 
     @property
     def marty(self):
-        """Accès direct à l'objet martypy (None si déconnecté)."""
+        """
+        Accès direct à l'objet martypy (None si déconnecté).
+        """
         return self._marty
 
     @staticmethod
     def nettoyer_adresse_reseau(adresse):
+        """
+        Permet une souplesse de l'entrée utilisateur pour l'ip du réseau.
+        Vérifie la validité de l'adresse.
+
+        Exs:
+         - 192.168.0
+         - 192.168.0.0
+         - 192.168.0.0/24
+        """
         adresse = adresse.strip()
 
         if "/" in adresse:
@@ -73,10 +86,13 @@ class ConnexionMarty:
 
     @staticmethod
     def nettoyer_adresse_marty(adresse):
-        adresse = adresse.strip()
+        """
+        Vérifie la validité de l'adresse.
 
-        if "/" in adresse:
-            adresse = adresse.split("/")[0]
+        Exs:
+         - 192.168.0.01 -> 192.168.0.1
+         - 192.168.0.0111 -> Error
+        """
 
         morceaux = adresse.split(".")
 
@@ -93,6 +109,14 @@ class ConnexionMarty:
 
 
     def rechercher_martys(self, reseau: str, debut: int = 1, fin: int = 254) -> list:
+        """
+        Recherche les Marty disponibles sur le réseau local.
+
+        La fonction teste toutes les IP de reseau.1 à reseau.254.
+        Chaque IP est testée dans un thread pour accélérer la recherche.
+        Les serveurs trouvés sont ajoutés dans la liste PyQt.
+        Un lock est utilisé pour éviter les conflits quand plusieurs threads trouvent un Marty en même temps.
+        """
         resultats = []
         lock = threading.Lock()
         def sonder(i):

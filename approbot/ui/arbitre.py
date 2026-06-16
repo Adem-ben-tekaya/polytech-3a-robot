@@ -1,4 +1,15 @@
-from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QListWidget, QListWidgetItem, QApplication)
+from PyQt6.QtWidgets import (
+    QWidget, 
+    QVBoxLayout, 
+    QHBoxLayout, 
+    QLabel, 
+    QLineEdit, 
+    QPushButton, 
+    QListWidget, 
+    QListWidgetItem, 
+    QApplication
+    )
+
 from approbot.server_gets import ServerGets
 import threading
 
@@ -51,7 +62,6 @@ class OngletArbitre(QWidget):
 
 
         layout.addWidget(QLabel("Nom du robot"))
-
         self.input_nom_robot = QLineEdit()
         self.input_nom_robot.setPlaceholderText("Nom du robot")
         layout.addWidget(self.input_nom_robot)
@@ -107,6 +117,14 @@ class OngletArbitre(QWidget):
         lock = threading.Lock()
 
         def sonder(i):
+            """
+            Recherche les serveurs arbitres disponibles sur le réseau local.
+
+            La fonction teste toutes les IP de reseau.1 à reseau.254.
+            Chaque IP est testée dans un thread pour accélérer la recherche.
+            Les serveurs trouvés sont ajoutés dans la liste PyQt.
+            Un lock est utilisé pour éviter les conflits quand plusieurs threads trouvent un serveur en même temps.
+            """
             ip = f"{reseau}.{i}"
             resultat = ServerGets.sonder_serveur(ip)
             if resultat:
@@ -135,6 +153,10 @@ class OngletArbitre(QWidget):
         self.label_statut.setText(f"{len(serveurs)} serveur(s) trouvé(s).")
 
     def enregistrer_robot(self):
+        """
+        Permet à l'utilisateur de changer le nom 
+        de son robot dans le classement de l'arbitre
+        """
         nom = self.input_nom_robot.text().strip()
         if not nom:
             self.label_statut.setText("Nom invalide")

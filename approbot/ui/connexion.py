@@ -75,7 +75,7 @@ class OngletConnexion(QWidget):
 
         self.liste_martys.clear()
         self.label_statut.setText(f"Recherche dans {reseau}.X en cours.")
-        QApplication.processEvents()
+        QApplication.processEvents() # Rafraîchit l'interface avant le scan réseau, sinon le statut peut ne pas s'afficher immédiatement.
 
         try:
             martys = self.connexion.rechercher_martys(reseau)

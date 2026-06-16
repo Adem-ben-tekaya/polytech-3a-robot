@@ -1,6 +1,5 @@
 from PyQt6.QtWidgets import (
     QGridLayout,
-    QLineEdit,
     QSpinBox,
     QWidget,
     QVBoxLayout,
@@ -10,7 +9,6 @@ from PyQt6.QtWidgets import (
     QGroupBox,
     QFileDialog,
     QTextEdit,
-    QScrollArea,
     QSizePolicy
 )
 from PyQt6.QtCore import QThread, Qt

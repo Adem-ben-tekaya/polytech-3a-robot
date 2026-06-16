@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLabel,
+    QWidget, QVBoxLayout, QLabel,
     QLineEdit, QPushButton, QListWidget, QComboBox
 )
 
@@ -10,16 +10,20 @@ class OngletCalibration(QWidget):
         super().__init__()
 
         self.connexion = connexion
-        self.calibrateur = calibrateur if calibrateur is not None else CalibrateurCouleurs(connexion)
+
+        if calibrateur is not None:
+            self.calibrateur = calibrateur 
+        else :
+            self.calibrateur = CalibrateurCouleurs(connexion)
 
         layout = QVBoxLayout()
         layout.addWidget(QLabel("Calibration des couleurs"))
 
         self.champ_nom = QLineEdit()
-        self.champ_nom.setPlaceholderText("Nom de la couleur : rouge, bleu, noir...")
+        self.champ_nom.setPlaceholderText("Nom de la couleur : rouge, bleu, vert, violet, jaune...")
 
         self.combobox_condition = QComboBox()
-        self.combobox_condition.addItems([
+        self.combobox_condition.addItems([ #Les differentes prise de mesure permettent une meilleure détection de la couleur
             "Très lumineux",
             "Normal",
             "Très sombre"
