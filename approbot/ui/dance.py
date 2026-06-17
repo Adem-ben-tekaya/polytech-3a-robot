@@ -21,6 +21,11 @@ from approbot.choreo_worker import ChoreoWorker
 
 class OngletDance(QWidget):
     def __init__(self, connexion, calibrateur, serveur=None):
+        """
+        connexion  : instance ConnexionMarty partagée
+        calibrateur: instance CalibrateurCouleurs partagée
+        serveur    : instance ServerGets (None si on joue hors serveur)
+        """
         super().__init__()
 
         self.connexion = connexion
@@ -140,6 +145,7 @@ class OngletDance(QWidget):
     # ── Slots ─────────────────────────────────────────────────────────────
 
     def _charger_dance(self):
+        """Ouvre un sélecteur de fichier, parse le .dance choisi et active le bouton Lancer."""
         path, _ = QFileDialog.getOpenFileName(
             self, "Ouvrir un fichier .dance", "", "Fichiers dance (*.dance)"
         )
@@ -156,6 +162,7 @@ class OngletDance(QWidget):
             self.label_statut.setText(f"Erreur lecture .dance : {e}")
 
     def _multiplicateurs(self):
+        """Retourne le dict des multiplicateurs actuels lus depuis les QSpinBox."""
         return {
             "U": self.champs_multiplicateurs["U"].value(),
             "B": self.champs_multiplicateurs["B"].value(),
@@ -164,6 +171,7 @@ class OngletDance(QWidget):
         }
     
     def _actualiser_apercu(self):
+        """Rafraîchit la zone de texte d'aperçu en appliquant les multiplicateurs courants aux mouvements."""
         if self._dance is None:
             return
 
@@ -217,6 +225,7 @@ class OngletDance(QWidget):
         self.texte_apercu.setPlainText("\n".join(lignes))
 
     def _lancer(self):
+        """Crée le ChoreoWorker, le déplace dans un QThread et démarre la chorégraphie."""
         if not self.connexion.is_connected():
             self.label_statut.setText("Statut : robot non connecté")
             return
@@ -273,13 +282,16 @@ class OngletDance(QWidget):
         self._thread.start()
 
     def _arreter(self):
+        """Signale au worker de s'arrêter après le pas en cours (ne tue pas le thread immédiatement)."""
         if self._worker is not None:
             self._worker.stop()
 
     def _on_log(self, message: str):
+        """Ajoute un message de log du worker dans la zone de résultats."""
         self.log_execution.append(message)
 
     def _on_step_done(self, num: int, direction: str, bras: str, expression: str):
+        """Met à jour le label de statut et le log après chaque pas terminé."""
         noms = {'U': 'avant', 'B': 'arrière', 'L': 'gauche', 'R': 'droite'}
         self.label_statut.setText(
             f"Pas {num} — {noms.get(direction, direction)} | bras: {bras} | expression: {expression}"
@@ -289,10 +301,12 @@ class OngletDance(QWidget):
         )
 
     def _on_error(self, message: str):
+        """Affiche l'erreur dans le log et le label de statut."""
         self.log_execution.append(f"\nErreur : {message}")
         self.label_statut.setText(f"Erreur : {message}")
 
     def _on_finished(self):
+        """Réactive le bouton Lancer et libère les références au thread/worker."""
         self.bouton_lancer.setEnabled(self._dance is not None)
         self.bouton_arreter.setEnabled(False)
         self._worker = None

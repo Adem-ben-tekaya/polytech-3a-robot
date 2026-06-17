@@ -18,6 +18,14 @@ class ChoreoWorker(QObject):
     error = pyqtSignal(str)
 
     def __init__(self, mouvement, dance_or_dance_file_path, nb_steps: int, multipliers: dict | None = None, serveur=None, offline: bool = False):
+        """
+        mouvement              : instance MouvementMarty (peut être None en mode offline)
+        dance_or_dance_file_path : dict déjà parsé ou chemin vers un fichier .dance
+        nb_steps               : nombre de pas à exécuter (boucle sur les moves si nécessaire)
+        multipliers            : facteur de répétition par direction, ex. {"U":2,"L":4}
+        serveur                : instance ServerGets pour envoyer les points (None = pas de serveur)
+        offline                : si True, simule les couleurs sans appeler le robot
+        """
         super().__init__()
 
         self._mouvement = mouvement
@@ -40,10 +48,12 @@ class ChoreoWorker(QObject):
 
 
     def stop(self):
+        """Demande l'arrêt de la chorégraphie après le pas en cours."""
         self._stop = True
 
 
     def run(self):
+        """Point d'entrée du QThread : exécute la chorégraphie pas à pas et émet les signaux."""
         moves = self._dance['moves']
         actions = self._dance['actions']
         nb_moves = len(moves)
@@ -257,6 +267,15 @@ def charger_dance(chemin_fichier):
 
 
 def lancer_battle_console(ip_marty, ip_serveur, fichier_dance, nom_robot="Marty", offline=False):
+    """
+    Lance une battle complète en mode console (sans interface graphique).
+
+    ip_marty     : IP du robot Marty (ignoré si offline=True)
+    ip_serveur   : IP du serveur arbitre (ex. "192.168.1.10:8080")
+    fichier_dance: chemin vers le fichier .dance à exécuter
+    nom_robot    : nom envoyé au serveur pour identifier le joueur
+    offline      : si True, simule les couleurs sans connecter de robot
+    """
     import sys
     import os
 

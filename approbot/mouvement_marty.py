@@ -13,10 +13,15 @@ SIDE_STEP_TIME   = 600
 class MouvementMarty:
 
     def __init__(self, connexion, calibrateur):
+        """
+        connexion  : instance ConnexionMarty partagée avec les autres onglets
+        calibrateur: instance CalibrateurCouleurs pour la lecture et la correspondance de couleur
+        """
         self._connexion = connexion
         self._calibrateur = calibrateur
         
     def goat_dance(self):
+        """Enchaîne une position droite + bras à zéro + expression joueur (animation festive)."""
         self.marty.stand_straight(300)
         self.marty.arms(0, 0, 300, False)
         self.set_expression("XDN")
@@ -63,6 +68,10 @@ class MouvementMarty:
 
 
     def set_expression(self, token: str) -> None:
+        """Applique une expression au robot : yeux + LEDs selon le token reçu.
+
+        tokens: 'XNT' neutre, 'XHP' content, 'XSD' triste, 'XNG' en colère, 'XDN' joueur
+        """
         if not self._connexion.is_connected():
             return
         
@@ -157,6 +166,7 @@ class MouvementMarty:
         return (r, g, b)
     
     def get_couleur(self):
+        """Lit le capteur couleur et retourne le nom de la couleur calibrée la plus proche."""
         return self._calibrateur.get_couleur()
     
     def get_batterie(self) -> float:

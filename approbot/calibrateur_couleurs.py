@@ -9,6 +9,7 @@ FICHIER_CALIBRATION_DEFAUT = os.path.join(os.path.dirname(os.path.abspath(__file
 
 class CalibrateurCouleurs:
     def __init__(self, connexion=None, nom_fichier=FICHIER_CALIBRATION_DEFAUT):
+        """Initialise le calibrateur. connexion peut être None pour un usage hors robot."""
         self.connexion = connexion
         self.nom_fichier = nom_fichier
         self.mesures = []
@@ -87,9 +88,6 @@ class CalibrateurCouleurs:
         """
         Trouve la couleur calibrée la plus proche d'une valeur HEX.
         Retourne toujours un tuple (nom: str, distance: float).
-
-        Exemple :
-            calibrateur.trouver_couleur_depuis_hex("871819")  ->  ("Rouge", 12.4)
         """
         if not self.mesures:
             return "inconnue", 0.0
@@ -119,10 +117,12 @@ class CalibrateurCouleurs:
 
     # Gestion du fichier de calibration
     def sauvegarder_calibration(self):
+        """Écrit toutes les mesures en mémoire dans le fichier JSON de calibration."""
         with open(self.nom_fichier, "w", encoding="utf-8") as fichier:
             json.dump(self.mesures, fichier, indent=4, ensure_ascii=False)
 
     def charger_calibration(self):
+        """Charge les mesures depuis le fichier JSON. Initialise une liste vide si le fichier est absent ou corrompu."""
         if not os.path.exists(self.nom_fichier):
             self.mesures = []
             return
@@ -156,6 +156,7 @@ class CalibrateurCouleurs:
 
     @staticmethod
     def hex_vers_rgb(clean_valeur_hex):
+        """Convertit une chaîne 'rrggbb' en liste [r, g, b] d'entiers 0-255."""
         r = int(clean_valeur_hex[0:2], 16)
         g = int(clean_valeur_hex[2:4], 16)
         b = int(clean_valeur_hex[4:6], 16)
@@ -163,6 +164,7 @@ class CalibrateurCouleurs:
 
     @staticmethod
     def distance_rgb(rgb1, rgb2):
+        """Calcule la distance euclidienne entre deux couleurs dans l'espace RGB."""
         return math.sqrt(
             (rgb1[0] - rgb2[0]) ** 2 +
             (rgb1[1] - rgb2[1]) ** 2 +
