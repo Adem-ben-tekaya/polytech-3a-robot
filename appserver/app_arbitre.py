@@ -43,5 +43,5 @@ if __name__ == '__main__':
         fenetre._log(f"Fichier chargé au démarrage : {args.battle}", "#f39c12")
         fenetre.maj_status()
 
-    fenetre.show()
+    fenetre.showMaximized()
     sys.exit(app.exec())

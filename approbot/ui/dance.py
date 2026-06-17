@@ -78,7 +78,6 @@ class OngletDance(QWidget):
         self.label_fichier = QLabel("Aucun fichier chargé")
         self.label_fichier.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         bouton_charger = QPushButton("Charger .dance")
-        bouton_charger.setFixedWidth(140)
         bouton_charger.clicked.connect(self._charger_dance)
 
         layout_fichier.addWidget(self.label_fichier)
@@ -131,7 +130,6 @@ class OngletDance(QWidget):
         layout_resultats.addWidget(self.log_execution)
 
         bouton_effacer = QPushButton("Effacer les résultats")
-        bouton_effacer.setFixedWidth(180)
         bouton_effacer.clicked.connect(self.log_execution.clear)
         layout_resultats.addWidget(bouton_effacer)
 
