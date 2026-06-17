@@ -33,10 +33,15 @@ class OngletArbitre(QWidget):
         self.input_ip = QLineEdit()
         self.input_ip.setPlaceholderText("IP serveur ex : 192.168.1.10")
 
+        self.input_port = QLineEdit("8080")
+        self.input_port.setPlaceholderText("Port")
+        self.input_port.setFixedWidth(70)
+
         self.bouton_connexion = QPushButton("Connexion manuelle")
         self.bouton_connexion.clicked.connect(self.connecter_ip_manuelle)
 
         ligne_ip.addWidget(self.input_ip)
+        ligne_ip.addWidget(self.input_port)
         ligne_ip.addWidget(self.bouton_connexion)
 
         layout.addLayout(ligne_ip)
@@ -77,7 +82,8 @@ class OngletArbitre(QWidget):
         if not ip:
             self.label_statut.setText("Erreur : IP invalide")
             return
-        self.connecter(ip)
+        port = self._lire_port()
+        self.connecter(ip, port)
 
     def connecter_selection(self):
         item = self.liste_serveurs.currentItem()
@@ -85,11 +91,19 @@ class OngletArbitre(QWidget):
             self.label_statut.setText("Erreur : sélectionnez un serveur.")
             return
         ip = item.data(1000)
-        self.connecter(ip)
+        port = self._lire_port()
+        self.connecter(ip, port)
 
-    def connecter(self, ip):
+    def _lire_port(self) -> int:
+        """Lit le port saisi dans le champ dédié, retourne 8080 si invalide."""
         try:
-            self.requetes.url_serveur = f"http://{ip}:8080"
+            return int(self.input_port.text().strip())
+        except ValueError:
+            return 8080
+
+    def connecter(self, ip, port=8080):
+        try:
+            self.requetes.url_serveur = f"http://{ip}:{port}"
             version = self.requetes.verifier_connexion()
             reponse = self.requetes.hello()
             self.rid = reponse["rid"]
@@ -111,7 +125,8 @@ class OngletArbitre(QWidget):
             self.label_statut.setText("Erreur : réseau invalide.")
             return
         self.liste_serveurs.clear()
-        self.label_statut.setText(f"Recherche dans {reseau}.X/24 en cours.")
+        port = self._lire_port()
+        self.label_statut.setText(f"Recherche dans {reseau}.X/24 sur le port {port} en cours.")
         QApplication.processEvents()
         serveurs = []
         lock = threading.Lock()
@@ -126,7 +141,7 @@ class OngletArbitre(QWidget):
             Un lock est utilisé pour éviter les conflits quand plusieurs threads trouvent un serveur en même temps.
             """
             ip = f"{reseau}.{i}"
-            resultat = ServerGets.sonder_serveur(ip)
+            resultat = ServerGets.sonder_serveur(ip, port)
             if resultat:
                 with lock:
                     serveurs.append(resultat)

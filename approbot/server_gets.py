@@ -5,9 +5,9 @@ class ServerGets:
         self.url_serveur = None
         self.rid = None
 
-    def definir_url(self,ip):
-        ip_server= ip
-        url_serveur = "http://"+ip_server+":8080"
+    def definir_url(self, ip, port=8080):
+        """Construit l'URL de base du serveur à partir de l'IP et du port."""
+        url_serveur = f"http://{ip}:{port}"
         self.url_serveur = url_serveur.rstrip("/")
 
     def verifier_connexion(self):
@@ -194,14 +194,14 @@ class ServerGets:
         return reponse.json()
 
     @staticmethod
-    def sonder_serveur(ip: str, timeout=1):
+    def sonder_serveur(ip: str, port: int = 8080, timeout=1):
         """
-        Boucle sur toute les IPs du réseau entré par 
-        l'utilisateur afin de trouver un appareil qui 
-        repondra à http://{ip}:8080/
+        Boucle sur toute les IPs du réseau entré par
+        l'utilisateur afin de trouver un appareil qui
+        repondra à http://{ip}:{port}/
         """
         try:
-            reponse = requests.get(f"http://{ip}:8080/",timeout=timeout)
+            reponse = requests.get(f"http://{ip}:{port}/",timeout=timeout)
             if reponse.status_code != 200:
                 return None
             data = reponse.json()
