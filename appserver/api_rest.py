@@ -87,7 +87,7 @@ def demarrer_choregraphie():
             robot_trouve = info
     if robot_trouve is None:
         return jsonify({'error': 'Robot inconnu'}), 404
-    nombre_mouvements = regles_battle.get('MVS', 10)            #Le nombre de mouvements vient du fichier .battle, sinon 10 par défaut
+    nombre_mouvements = regles_battle.get('MVS', 5)            #Le nombre de mouvements vient du fichier .battle, sinon 5 par défaut
     print(f"Robot = {identifiant_robot} démarre, {nombre_mouvements} mouvements")
     return jsonify({'steps': nombre_mouvements}), 200
 

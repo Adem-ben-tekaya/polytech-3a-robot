@@ -46,7 +46,7 @@ class OngletArbitre(QWidget):
 
         layout.addLayout(ligne_ip)
 
-        self.input_reseau = QLineEdit("192.168.1")
+        self.input_reseau = QLineEdit("192.168.0")
         self.input_reseau.setPlaceholderText("Réseau ex : 192.168.1")
         layout.addWidget(self.input_reseau)
 
