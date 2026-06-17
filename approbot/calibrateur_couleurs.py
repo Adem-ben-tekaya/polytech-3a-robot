@@ -159,14 +159,7 @@ class CalibrateurCouleurs:
 
     @staticmethod
     def hex_vers_rgb(clean_valeur_hex):
-<<<<<<< HEAD
-        """
-        Converti une valeur hexadécimal en valeur RGB
-        Ex: ff34ad -> [255, 52, 173]
-        """
-=======
         """Convertit une chaîne 'rrggbb' en liste [r, g, b] d'entiers 0-255."""
->>>>>>> ad27e98a679bba5ca355b22af4423bc768ccbdee
         r = int(clean_valeur_hex[0:2], 16)
         g = int(clean_valeur_hex[2:4], 16)
         b = int(clean_valeur_hex[4:6], 16)
@@ -174,13 +167,7 @@ class CalibrateurCouleurs:
 
     @staticmethod
     def distance_rgb(rgb1, rgb2):
-<<<<<<< HEAD
-        """
-        Calcul savant de la distance entre deux couleurs
-        """
-=======
         """Calcule la distance euclidienne entre deux couleurs dans l'espace RGB."""
->>>>>>> ad27e98a679bba5ca355b22af4423bc768ccbdee
         return math.sqrt(
             (rgb1[0] - rgb2[0]) ** 2 +
             (rgb1[1] - rgb2[1]) ** 2 +
