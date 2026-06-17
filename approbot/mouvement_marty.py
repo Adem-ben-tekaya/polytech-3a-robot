@@ -20,11 +20,6 @@ class MouvementMarty:
         self._connexion = connexion
         self._calibrateur = calibrateur
         
-    def goat_dance(self):
-        """Enchaîne une position droite + bras à zéro + expression joueur (animation festive)."""
-        self.marty.stand_straight(300)
-        self.marty.arms(0, 0, 300, False)
-        self.set_expression("XDN")
 
     def marcher(self, direction: str, count: int = 1) -> None:
         """Fait avancer/reculer/pivoter le robot de *count* pas.
@@ -152,9 +147,7 @@ class MouvementMarty:
         marty.disco_off(api='led')
         marty.eyes("normal", move_time=300)
 
-    # ------------------------------------------------------------------
     # Capteurs
-    # ------------------------------------------------------------------
 
     def get_couleur_raw(self) -> tuple:
         """Retourne (r, g, b) lus par le capteur de couleur, ou (0,0,0) si déconnecté."""
